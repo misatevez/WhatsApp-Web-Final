@@ -7,7 +7,7 @@ import type React from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
-const ICON_URL = "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110"
+const ICON_URL = "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon%20final.png?alt=media&token=a737809b-73f8-458c-b839-bbc6a5843267"
 
 export const viewport: Viewport = {
   width: "device-width",
