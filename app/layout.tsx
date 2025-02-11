@@ -8,14 +8,14 @@ import type React from "react"
 const inter = Inter({ subsets: ["latin"] })
 
 const ICON_URL =
-  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739"
+  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739"
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#111b21",
+  themeColor: "#0b141a",
   viewportFit: "cover",
   minimumScale: 1,
 }
@@ -52,7 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#111b21" />
+        <meta name="theme-color" content="#0b141a" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, minimal-ui"
@@ -62,11 +62,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="icon" type="image/png" href={ICON_URL} />
         <link rel="manifest" href="/manifest.json" />
         <style>{`
+          :root {
+            background: #0b141a;
+          }
+          html {
+            background: #0b141a;
+          }
           @media (display-mode: standalone) {
             html {
               -webkit-text-size-adjust: 100%;
               height: 100vh;
               overflow: hidden;
+              background: #0b141a;
             }
             body {
               height: 100vh;
@@ -75,11 +82,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               user-select: none;
               -webkit-tap-highlight-color: transparent;
               -webkit-touch-callout: none;
+              background: #0b141a;
+              padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            }
+            #__next {
+              background: #0b141a;
             }
           }
         `}</style>
       </head>
-      <body className={`${inter.className} h-full`}>
+      <body
+        className={`${inter.className} h-full bg-[#0b141a]`}
+        style={{
+          backgroundImage: 'url("https://static.whatsapp.net/rsrc.php/v4/yl/r/gi_DckOUM5a.png")',
+          backgroundSize: "600px",
+          backgroundRepeat: "repeat",
+          backgroundPosition: "center",
+        }}
+      >
         <ToastProvider>
           {children}
           <Toaster />

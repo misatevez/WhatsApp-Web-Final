@@ -4,18 +4,28 @@
   "description": "Envía y recibe mensajes sin mantener tu teléfono conectado",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#111b21",
-  "theme_color": "#111b21",
+  "background_color": "#0b141a",
+  "theme_color": "#0b141a",
   "orientation": "portrait",
+  "scope": "/",
+  "prefer_related_applications": false,
+  "display_override": ["standalone", "fullscreen"],
+  "categories": ["social", "communication"],
+  "launch_handler": {
+    "client_mode": ["focus-existing", "auto"]
+  },
+  "edge_side_panel": {
+    "preferred_width": 480
+  },
   "icons": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739",
+      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739",
+      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
