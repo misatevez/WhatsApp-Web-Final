@@ -8,7 +8,7 @@ import type React from "react"
 const inter = Inter({ subsets: ["latin"] })
 
 const ICON_URL =
-  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110"
+  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110"
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -61,35 +61,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon-precomposed" href={ICON_URL} />
         <link rel="icon" type="image/png" href={ICON_URL} />
         <link rel="manifest" href="/manifest.json" />
-        <style>{`
-          :root {
-            background: #0b141a;
-          }
-          html {
-            background: #0b141a;
-          }
-          @media (display-mode: standalone) {
-            html {
-              -webkit-text-size-adjust: 100%;
-              height: 100vh;
-              overflow: hidden;
-              background: #0b141a;
-            }
-            body {
-              height: 100vh;
-              overflow: hidden;
-              -webkit-user-select: none;
-              user-select: none;
-              -webkit-tap-highlight-color: transparent;
-              -webkit-touch-callout: none;
-              background: #0b141a;
-              padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-            }
-            #__next {
-              background: #0b141a;
-            }
-          }
-        `}</style>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(function(registration) {
+                      console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                      console.log('ServiceWorker registration failed: ', err);
+                    });
+                });
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${inter.className} h-full bg-[#0b141a]`}
@@ -108,4 +96,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
-

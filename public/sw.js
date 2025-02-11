@@ -3,6 +3,7 @@ const CACHE_NAME = 'whatsapp-web-v1'
 
 const STATIC_ASSETS = [
   '/',
+  '/chat',
   '/manifest.json',
   '/icons/icon-72x72.png',
   '/icons/icon-96x96.png',
@@ -35,26 +36,27 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin requests
-  if (!event.request.url.startsWith(self.location.origin)) return
+  // Handle navigation requests specially
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => {
+        return caches.match('/') // Return cached home page as fallback
+      })
+    )
+    return
+  }
 
+  // Handle other requests
   event.respondWith(
     caches.match(event.request).then((response) => {
-      // Return cached response if found
       if (response) return response
 
-      // Clone the request because it can only be used once
-      const fetchRequest = event.request.clone()
-
-      return fetch(fetchRequest).then((response) => {
-        // Check if valid response
+      return fetch(event.request).then((response) => {
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response
         }
 
-        // Clone the response because it can only be used once
         const responseToCache = response.clone()
-
         caches.open(CACHE_NAME).then((cache) => {
           cache.put(event.request, responseToCache)
         })
@@ -92,4 +94,3 @@ self.addEventListener('notificationclick', (event) => {
     clients.openWindow(event.notification.data.url)
   )
 })
-

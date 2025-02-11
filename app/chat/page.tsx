@@ -10,23 +10,27 @@ export default function ChatPage() {
   const phone = searchParams.get("phone")
 
   useEffect(() => {
-    // Verificar si estamos en iOS
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-
-    // Intentar entrar en modo fullscreen
-    if (isIOS) {
-      if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {
-          // Silenciar error si el fullscreen falla
-        })
-      }
+    // Prevent default browser behaviors
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault()
+      return (e.returnValue = "")
     }
 
-    // Ocultar la barra de navegación en iOS
-    if (isIOS) {
-      window.scrollTo(0, 1)
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    // Handle iOS PWA
+    if (window.navigator.standalone) {
+      document.addEventListener("touchstart", (e) => {
+        e.preventDefault()
+      }, { passive: false })
     }
 
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!phone) {
       const savedPhone = localStorage.getItem("whatsapp_phone")
       if (savedPhone) {
@@ -34,19 +38,6 @@ export default function ChatPage() {
       } else {
         router.push("/")
       }
-    }
-
-    // Prevenir el scroll y el rebote en iOS
-    document.body.style.position = "fixed"
-    document.body.style.width = "100%"
-    document.body.style.height = "100%"
-    document.body.style.overflow = "hidden"
-
-    return () => {
-      document.body.style.position = ""
-      document.body.style.width = ""
-      document.body.style.height = ""
-      document.body.style.overflow = ""
     }
   }, [phone, router])
 
@@ -79,4 +70,3 @@ export default function ChatPage() {
     </div>
   )
 }
-
