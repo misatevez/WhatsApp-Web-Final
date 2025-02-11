@@ -50,6 +50,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#111b21" />
         <meta
           name="viewport"
@@ -59,6 +61,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon-precomposed" href={ICON_URL} />
         <link rel="icon" type="image/png" href={ICON_URL} />
         <link rel="manifest" href="/manifest.json" />
+        <style>{`
+          @media (display-mode: standalone) {
+            html {
+              -webkit-text-size-adjust: 100%;
+              height: 100vh;
+              overflow: hidden;
+            }
+            body {
+              height: 100vh;
+              overflow: hidden;
+              -webkit-user-select: none;
+              user-select: none;
+              -webkit-tap-highlight-color: transparent;
+              -webkit-touch-callout: none;
+            }
+          }
+        `}</style>
       </head>
       <body className={`${inter.className} h-full`}>
         <ToastProvider>

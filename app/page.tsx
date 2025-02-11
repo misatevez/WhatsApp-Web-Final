@@ -10,6 +10,8 @@ import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { sendWelcomeMessage } from "@/lib/firestore/messages"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
+import { IOSInstallPrompt } from "@/components/shared/IOSInstallPrompt"
+import { InstallPWA } from "@/components/shared/InstallPWA"
 
 export default function Page() {
   const { toast } = useToast()
@@ -23,6 +25,15 @@ export default function Page() {
     type: "error" | "success"
     message: string
   } | null>(null)
+  const [isIOS, setIsIOS] = React.useState(false)
+  const [isStandalone, setIsStandalone] = React.useState(false)
+
+  useEffect(() => {
+    const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    const standalone = window.matchMedia("(display-mode: standalone)").matches
+    setIsIOS(iOS)
+    setIsStandalone(standalone)
+  }, [])
 
   useEffect(() => {
     const savedPhone = localStorage.getItem("whatsapp_phone")
@@ -103,6 +114,7 @@ export default function Page() {
 
     if (verificationCode === sentCode) {
       try {
+        setIsLoading(true)
         const chatRef = doc(db, "chats", phoneNumber)
         const chatDoc = await getDoc(chatRef)
 
@@ -130,6 +142,8 @@ export default function Page() {
       } catch (error: any) {
         console.error("Error creating chat:", error)
         showAlert("error", "Error al crear el chat")
+      } finally {
+        setIsLoading(false)
       }
     } else {
       showAlert("error", "Código incorrecto")
@@ -141,6 +155,8 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-[#111b21] flex items-center justify-center px-4 pt-safe-top pb-safe-bottom">
+      {!isStandalone && (isIOS ? <IOSInstallPrompt /> : <InstallPWA />)}
+
       <div className="w-full max-w-md bg-[#202c33] rounded-2xl p-8 shadow-lg relative">
         {alert && (
           <div
@@ -176,14 +192,10 @@ export default function Page() {
             />
             <Button
               type="submit"
-              className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all relative"
+              className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all"
               disabled={isLoading || phoneNumber.length < 13}
             >
-              {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
-              ) : (
-                "Verificar número"
-              )}
+              {isLoading ? "Cargando..." : "Verificar número"}
             </Button>
           </form>
         ) : (
@@ -200,9 +212,9 @@ export default function Page() {
             <Button
               type="submit"
               className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all"
-              disabled={verificationCode.length !== 6}
+              disabled={verificationCode.length !== 6 || isLoading}
             >
-              Verificar código
+              {isLoading ? "Cargando..." : "Verificar código"}
             </Button>
             <Button
               type="button"
@@ -212,6 +224,7 @@ export default function Page() {
                 setStep("phone")
                 setVerificationCode("")
               }}
+              disabled={isLoading}
             >
               Cambiar número
             </Button>
