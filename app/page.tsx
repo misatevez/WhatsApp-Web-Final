@@ -9,6 +9,7 @@ import Image from "next/image"
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { sendWelcomeMessage } from "@/lib/firestore/messages"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 
 export default function Page() {
   const { toast } = useToast()
@@ -18,6 +19,10 @@ export default function Page() {
   const [sentCode, setSentCode] = React.useState<string | null>(null)
   const [step, setStep] = React.useState<"phone" | "code">("phone")
   const [isLoading, setIsLoading] = React.useState(false)
+  const [alert, setAlert] = React.useState<{
+    type: "error" | "success"
+    message: string
+  } | null>(null)
 
   useEffect(() => {
     const savedPhone = localStorage.getItem("whatsapp_phone")
@@ -37,15 +42,16 @@ export default function Page() {
     setPhoneNumber("+54" + digits)
   }
 
+  const showAlert = (type: "error" | "success", message: string) => {
+    setAlert({ type, message })
+    setTimeout(() => setAlert(null), 3000)
+  }
+
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!phoneNumber.trim() || phoneNumber.length < 14) {
-      toast({
-        title: "Error",
-        description: "Por favor ingresa un número de teléfono válido",
-        variant: "destructive",
-      })
+      showAlert("error", "Por favor ingresa un número de teléfono válido (Ej: +54 9 11 1234 5678)")
       return
     }
 
@@ -60,7 +66,6 @@ export default function Page() {
 
       let data
       const responseText = await response.text()
-      console.log("Respuesta del servidor:", responseText)
 
       try {
         data = JSON.parse(responseText)
@@ -76,20 +81,13 @@ export default function Page() {
       if (data.success) {
         setSentCode(data.verificationCode.toString())
         setStep("code")
-        toast({
-          title: "Código enviado",
-          description: "Revisa tu WhatsApp para ver el código de verificación",
-        })
+        showAlert("success", "Código enviado. Revisa tu WhatsApp")
       } else {
         throw new Error(data.error || "Error al enviar el código")
       }
     } catch (error: any) {
       console.error("Error sending code:", error)
-      toast({
-        title: "Error",
-        description: error.message || "Error al enviar el código de verificación. Por favor, intenta de nuevo.",
-        variant: "destructive",
-      })
+      showAlert("error", error.message || "Error al enviar el código de verificación")
     } finally {
       setIsLoading(false)
     }
@@ -99,17 +97,12 @@ export default function Page() {
     e.preventDefault()
 
     if (!verificationCode.trim() || !sentCode) {
-      toast({
-        title: "Error",
-        description: "Por favor ingresa el código de verificación",
-        variant: "destructive",
-      })
+      showAlert("error", "Por favor ingresa el código de verificación")
       return
     }
 
     if (verificationCode === sentCode) {
       try {
-        // Create or get chat document
         const chatRef = doc(db, "chats", phoneNumber)
         const chatDoc = await getDoc(chatRef)
 
@@ -129,27 +122,17 @@ export default function Page() {
         }
 
         localStorage.setItem("whatsapp_phone", phoneNumber)
+        showAlert("success", "¡Verificación exitosa!")
 
-        toast({
-          title: "¡Verificación exitosa!",
-          description: "Redirigiendo al chat...",
-        })
-
-        router.push(`/chat?phone=${encodeURIComponent(phoneNumber)}`)
+        setTimeout(() => {
+          router.push(`/chat?phone=${encodeURIComponent(phoneNumber)}`)
+        }, 1500)
       } catch (error: any) {
         console.error("Error creating chat:", error)
-        toast({
-          title: "Error",
-          description: "Error al crear el chat",
-          variant: "destructive",
-        })
+        showAlert("error", "Error al crear el chat")
       }
     } else {
-      toast({
-        title: "Error",
-        description: "Código incorrecto",
-        variant: "destructive",
-      })
+      showAlert("error", "Código incorrecto")
       setTimeout(() => {
         setVerificationCode("")
       }, 1500)
@@ -157,8 +140,19 @@ export default function Page() {
   }
 
   return (
-    <div className="min-h-screen bg-[#111b21] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-[#202c33] rounded-2xl p-8 shadow-lg">
+    <div className="min-h-screen bg-[#111b21] flex items-center justify-center px-4 pt-safe-top pb-safe-bottom">
+      <div className="w-full max-w-md bg-[#202c33] rounded-2xl p-8 shadow-lg relative">
+        {alert && (
+          <div
+            className={`absolute -top-16 left-0 right-0 mx-4 p-4 rounded-lg flex items-center gap-2 text-sm font-medium ${
+              alert.type === "error" ? "bg-red-500/10 text-red-500" : "bg-green-500/10 text-green-500"
+            }`}
+          >
+            {alert.type === "error" ? <AlertCircle className="h-5 w-5" /> : <CheckCircle2 className="h-5 w-5" />}
+            {alert.message}
+          </div>
+        )}
+
         <div className="flex justify-center mb-6">
           <Image
             src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
@@ -172,21 +166,21 @@ export default function Page() {
           <form onSubmit={handleSendCode} className="space-y-4">
             <Input
               type="tel"
-              placeholder="+54 9 11 XXXX XXXX"
+              placeholder="+54 9 11 1234 5678"
               value={phoneNumber}
               onChange={handlePhoneNumberChange}
-              className="w-full h-12 bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0]"
+              className="w-full h-12 bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] text-base"
               maxLength={14}
               disabled={isLoading}
               autoFocus
             />
             <Button
               type="submit"
-              className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all"
+              className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all relative"
               disabled={isLoading || phoneNumber.length < 13}
             >
               {isLoading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
               ) : (
                 "Verificar número"
               )}
@@ -196,10 +190,10 @@ export default function Page() {
           <form onSubmit={handleVerifyCode} className="space-y-4">
             <Input
               type="text"
-              placeholder="Ingresa el código de 6 dígitos"
+              placeholder="Código de 6 dígitos"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full h-12 text-center text-2xl tracking-[0.5em] font-mono bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0]"
+              className="w-full h-12 text-center text-xl tracking-[0.3em] font-mono bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] placeholder:text-base placeholder:tracking-normal"
               maxLength={6}
               autoFocus
             />

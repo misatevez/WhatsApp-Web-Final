@@ -1,4 +1,4 @@
-import { Inter } from 'next/font/google'
+import { Inter } from "next/font/google"
 import type { Metadata, Viewport } from "next"
 import { ToastProvider } from "@/contexts/ToastContext"
 import { Toaster } from "@/components/ui/toaster"
@@ -8,7 +8,7 @@ import type React from "react"
 const inter = Inter({ subsets: ["latin"] })
 
 const ICON_URL =
-  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739";
+  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739"
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -18,7 +18,7 @@ export const viewport: Viewport = {
   themeColor: "#111b21",
   viewportFit: "cover",
   minimumScale: 1,
-};
+}
 
 export const metadata: Metadata = {
   title: "Cargatusfichas.com",
@@ -42,22 +42,25 @@ export const metadata: Metadata = {
       url: ICON_URL,
     },
   },
-};
+}
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="theme-color" content="#111b21" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, minimal-ui"
+        />
         <link rel="apple-touch-icon" href={ICON_URL} />
         <link rel="apple-touch-icon-precomposed" href={ICON_URL} />
         <link rel="icon" type="image/png" href={ICON_URL} />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} h-full`}>
         <ToastProvider>
           {children}
           <Toaster />
