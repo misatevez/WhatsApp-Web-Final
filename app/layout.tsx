@@ -1,5 +1,5 @@
-import { Inter } from "next/font/google"
-import type { Metadata } from "next"
+import { Inter } from 'next/font/google'
+import type { Metadata, Viewport } from "next"
 import { ToastProvider } from "@/contexts/ToastContext"
 import { Toaster } from "@/components/ui/toaster"
 import "./globals.css"
@@ -42,7 +42,6 @@ export const metadata: Metadata = {
       url: ICON_URL,
     },
   },
-    generator: 'v0.dev'
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -68,6 +67,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 
-
-
-import './globals.css'
