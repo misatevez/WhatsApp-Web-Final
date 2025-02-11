@@ -1,0 +1,39 @@
+{
+  "name": "Cargatusfichas.com",
+  "short_name": "Cargatusfichas.com",
+  "description": "Envía y recibe mensajes sin mantener tu teléfono conectado.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111b21",
+  "theme_color": "#111b21",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon.png?alt=media&token=b5607c23-a39a-409d-ba88-64969459e739",
+      "sizes": "72x72 96x96 128x128 144x144 152x152 192x192 384x384 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Iniciar Chat",
+      "url": "/chat",
+      "description": "Ir directamente al chat"
+    }
+  ],
+  "categories": ["social", "utilities"],
+  "screenshots": [],
+  "related_applications": [],
+  "protocol_handlers": [
+    {
+      "protocol": "web+whatsapp",
+      "url": "/chat?phone=%s"
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  }
+}
+
