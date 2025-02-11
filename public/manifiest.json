@@ -8,6 +8,7 @@
   "background_color": "#0b141a",
   "theme_color": "#0b141a",
   "orientation": "portrait",
+  "scope": "/",
   "prefer_related_applications": false,
   "display_override": ["standalone", "fullscreen"],
   "categories": ["social", "communication"],
@@ -19,23 +20,16 @@
   },
   "icons": [
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110",
+      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110",
+      "src": "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.apps/o/admin%2Ffavicon%20(1).png?alt=media&token=96a82408-55c8-430f-a621-3ef3f7895110",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Chat",
-      "url": "/chat",
-      "description": "Open chat"
     }
   ]
 }

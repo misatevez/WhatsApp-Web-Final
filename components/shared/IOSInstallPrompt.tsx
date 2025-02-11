@@ -44,7 +44,7 @@ export function IOSInstallPrompt() {
             />
           </div>
           <DialogTitle className="text-center text-base">
-            Instalar WhatsApp Web
+          Instalar Cargatusfichas.com
           </DialogTitle>
         </DialogHeader>
 
