@@ -35,7 +35,13 @@ export default function ChatContent() {
 
   const sendWelcomeMessage = useCallback(async (chatId: string) => {
     try {
-      const welcomeMessage = "¡Hola! 👋 Bienvenido/a a nuestro servicio. ¿En qué puedo ayudarte hoy?"
+      const welcomeMessage = `¡Bienvenido a la web de cargas de línea 0800! 👨🏻‍💻👩🏼‍💻🎰✨
+
+Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU para comenzar a jugar de forma segura. 🍀💜
+
+¡Buena suerte y que la fortuna te acompañe en cada jugada! 🎲💰
+
+⚠️ Recuerda instalar el acceso rápido para poder cargar en todo momento y a toda velocidad!`;
       await sendMessage(
         chatId,
         welcomeMessage,
