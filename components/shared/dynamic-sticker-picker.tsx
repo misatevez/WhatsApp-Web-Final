@@ -40,13 +40,9 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
     setShowPicker(false)
   }
 
-  const handleAddStickerPack = () => {
-    // Implementar lógica para agregar nuevo pack de stickers
-    console.log("Agregar nuevo pack de stickers")
-  }
-
   return (
     <div className="relative">
+      {/* Botón para abrir el selector de stickers */}
       <Button
         type="button"
         variant="ghost"
@@ -57,8 +53,11 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
       >
         <Sticker className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
+
+      {/* Selector de stickers */}
       {showPicker && (
         <div className="absolute bottom-full left-0 mb-2 bg-[#202c33] rounded-lg shadow-lg w-[320px] overflow-hidden">
+          {/* Pestañas de packs de stickers */}
           <div className="p-2 border-b border-[#2f3b44]">
             <ScrollArea className="w-full whitespace-nowrap">
               <div className="flex space-x-2">
@@ -68,25 +67,30 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
                     variant={selectedPack === index ? "secondary" : "ghost"}
                     size="sm"
                     onClick={() => setSelectedPack(index)}
-                    className="flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[#00a884] focus:ring-offset-2 focus:ring-offset-[#202c33]"
+                    className="flex-shrink-0 rounded-full px-4 py-2 text-sm font-medium transition-colors 
+                    focus:outline-none focus:ring-2 focus:ring-[#00a884] focus:ring-offset-2 focus:ring-offset-[#202c33]"
                   >
                     {pack.name}
                   </Button>
                 ))}
-
               </div>
             </ScrollArea>
           </div>
+
+          {/* Contenedor de stickers */}
           <ScrollArea className="h-[320px] p-2">
             {loading ? (
-              <div className="flex items-center justify-center h-full text-[#8696a0]">Cargando stickers...</div>
+              <div className="flex items-center justify-center h-full text-[#8696a0]">
+                Cargando stickers...
+              </div>
             ) : stickerPacks.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-2 justify-items-center">
                 {stickerPacks[selectedPack]?.stickers.map((sticker) => (
                   <Button
                     key={sticker.id}
                     variant="ghost"
-                    className="p-1 aspect-square hover:bg-[#2f3b44]"
+                    className="p-1 aspect-square w-full max-w-[80px] rounded-md hover:bg-[#2f3b44] 
+                    flex items-center justify-center"
                     onClick={() => handleStickerClick(sticker.url)}
                   >
                     <img
@@ -99,7 +103,9 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-[#8696a0]">No hay stickers disponibles</div>
+              <div className="flex items-center justify-center h-full text-[#8696a0]">
+                No hay stickers disponibles
+              </div>
             )}
           </ScrollArea>
         </div>
