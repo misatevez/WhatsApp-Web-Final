@@ -41,20 +41,24 @@ export function AdminChatView({
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [chatSearchQuery, setChatSearchQuery] = useState("")
   const [isBlockUnblockDialogOpen, setIsBlockUnblockDialogOpen] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState<string>(selectedChat.userAvatar || selectedChat.photoURL || selectedChat.avatar || DEFAULT_AVATAR)
+  const [avatarUrl, setAvatarUrl] = useState<string>(
+    selectedChat.userAvatar || selectedChat.photoURL || selectedChat.avatar || DEFAULT_AVATAR,
+  )
   const { addToast } = useToast()
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
 
-  // Load user avatar from storage
+  useEffect(() => {
+    setShouldScrollToBottom(true)
+  }, [selectedChat])
+
   useEffect(() => {
     const loadUserAvatar = async () => {
       if (selectedChat.phoneNumber) {
         try {
-          // Try to get user avatar from storage
           const avatarRef = ref(storage, `users/${selectedChat.phoneNumber}/avatar`)
           const url = await getDownloadURL(avatarRef)
           setAvatarUrl(url)
         } catch (error) {
-          // If no avatar in storage, use existing avatar or default
           setAvatarUrl(selectedChat.userAvatar || selectedChat.photoURL || selectedChat.avatar || DEFAULT_AVATAR)
         }
       }
@@ -70,45 +74,46 @@ export function AdminChatView({
   }, [selectedChat?.id])
 
   const handleSendMessage = async (content: string, type: "text" | "image" | "document") => {
-    if (!content.trim() || !selectedChat?.id) {
+    if (!selectedChat?.id || !content.trim()) {
       console.log("[handleSendMessage] Invalid parameters:", { content, chatId: selectedChat?.id })
       return
     }
 
     try {
-      // Send message using the updated sendMessage function
-      const messageId = await sendMessage(
-        selectedChat.id,
-        content.trim(),
-        true, // isOutgoing true for admin messages
-        type
-      )
+      const messageId = await sendMessage(selectedChat.id, content.trim(), true, type)
 
       console.log("[handleSendMessage] Message sent with ID:", messageId)
 
-      // Update chat metadata
       const chatRef = doc(db, "chats", selectedChat.id)
       await updateDoc(chatRef, {
         lastMessage: content.trim(),
         lastMessageAdmin: content.trim(),
         lastMessageAdminTimestamp: serverTimestamp(),
         timestamp: serverTimestamp(),
-        unreadCount: 0
+        unreadCount: 0,
       })
+
+      setShouldScrollToBottom(true)
 
       addToast({
         title: "Mensaje enviado",
-        description: "El mensaje se envió correctamente"
+        description: "El mensaje se envió correctamente",
       })
     } catch (error) {
       console.error("Error sending message:", error)
       addToast({
         title: "Error",
         description: "No se pudo enviar el mensaje",
-        variant: "destructive"
+        variant: "destructive",
       })
     }
   }
+
+  useEffect(() => {
+    if (shouldScrollToBottom) {
+      setShouldScrollToBottom(false)
+    }
+  }, [shouldScrollToBottom])
 
   return (
     <div className="flex-1 flex flex-col">
@@ -175,6 +180,7 @@ export function AdminChatView({
           invertOutgoing={false}
           lastMessageUserTimestamp={lastMessageUserTimestamp}
           lastReadByAdmin={lastReadByAdmin}
+          scrollToBottom={shouldScrollToBottom}
         />
       </div>
 

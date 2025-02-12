@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useToast } from "@/contexts/ToastContext"
 import { ChatHeader } from "@/components/shared/chat-header"
@@ -29,6 +29,10 @@ export default function ChatContent() {
   const [searchQuery, setSearchQuery] = useState("")
   const [adminStatuses, setAdminStatuses] = useState<AdminStatus[]>([])
   const [isBlocked, setIsBlocked] = useState(false)
+  const [shouldScrollToBottom, setShouldScrollToBottom] = useState(true)
+  const [allImagesLoaded, setAllImagesLoaded] = useState(false)
+
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Format the phone number to include the '+' if it's missing
   const phoneNumber = rawPhoneNumber ? (rawPhoneNumber.startsWith("+") ? rawPhoneNumber : `+${rawPhoneNumber}`) : null
@@ -41,7 +45,7 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
 
 ¡Buena suerte y que la fortuna te acompañe en cada jugada! 🎲💰
 
-⚠️ Recuerda instalar el acceso rápido para poder cargar en todo momento y a toda velocidad!`;
+⚠️ Recuerda instalar el acceso rápido para poder cargar en todo momento y a toda velocidad!`
       await sendMessage(
         chatId,
         welcomeMessage,
@@ -205,10 +209,44 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
         ...doc.data(),
       })) as Message[]
       setMessages(updatedMessages)
+      setShouldScrollToBottom(true)
     })
 
     return () => unsubscribe()
   }, [phoneNumber])
+
+  // Check if all images are loaded
+  useEffect(() => {
+    const imageMessages = messages.filter((message) => message.type === "image" || message.type === "sticker")
+    if (imageMessages.length === 0) {
+      setAllImagesLoaded(true)
+      return
+    }
+
+    let loadedCount = 0
+    const checkAllImagesLoaded = () => {
+      loadedCount++
+      if (loadedCount === imageMessages.length) {
+        setAllImagesLoaded(true)
+      }
+    }
+
+    imageMessages.forEach((message) => {
+      const img = new Image()
+      img.onload = checkAllImagesLoaded
+      img.onerror = checkAllImagesLoaded
+      img.src = message.content
+    })
+  }, [messages])
+
+  // Scroll to bottom when all images are loaded and shouldScrollToBottom is true
+  useEffect(() => {
+    if (shouldScrollToBottom && allImagesLoaded) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      setShouldScrollToBottom(false)
+      setAllImagesLoaded(false)
+    }
+  }, [shouldScrollToBottom, allImagesLoaded])
 
   const handleSendMessage = async (content: string, type: "text" | "image" | "document") => {
     if (!chat?.id || !content.trim()) return
@@ -220,6 +258,7 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
         false, // isOutgoing false for user messages
         type,
       )
+      setShouldScrollToBottom(true)
     } catch (error) {
       console.error("Error sending message:", error)
     }
@@ -287,6 +326,7 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
           invertOutgoing={true}
           chatSearchQuery={searchQuery}
         />
+        <div ref={messagesEndRef} />
       </div>
 
       <MessageInput onSendMessage={handleSendMessage} chatId={chat.id} />

@@ -3,11 +3,11 @@
 import { useState, type React } from "react"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Send } from "lucide-react"
 import { EmojiPickerComponent } from "./emoji-picker"
 import { AttachmentPicker } from "./attachment-picker"
 import { DynamicStickerPicker } from "./dynamic-sticker-picker"
+import { Textarea } from "@/components/ui/textarea"
 
 interface MessageInputProps {
   chatId: string
@@ -39,7 +39,7 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
 
   const onEmojiSelect = (emojiData: any) => {
     const emoji = emojiData.emoji
-    const input = document.getElementById("message-input") as HTMLInputElement
+    const input = document.getElementById("message-input") as HTMLTextAreaElement
     const cursorPos = input?.selectionStart || message.length
     const updatedMessage = message.slice(0, cursorPos) + emoji + message.slice(cursorPos)
     setMessage(updatedMessage)
@@ -77,7 +77,7 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
     }
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSendMessage()
@@ -108,14 +108,16 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
         {isAdminRoute && <DynamicStickerPicker onStickerSelect={handleStickerSelect} disabled={isLoading} />}
 
         <div className="flex-1 min-w-0 px-1">
-          <Input
+          <Textarea
             id="message-input"
-            className="w-full bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] border-none focus-visible:ring-0 h-10 sm:h-12 text-sm sm:text-base rounded-lg"
+            className="w-full bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] border-none focus-visible:ring-0 h-10 sm:h-12 text-sm sm:text-base rounded-lg resize-none overflow-hidden"
             placeholder="Escribe un mensaje"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             disabled={isLoading}
+            rows={1}
+            style={{ minHeight: "40px", maxHeight: "120px" }}
           />
         </div>
 

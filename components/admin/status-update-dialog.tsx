@@ -1,22 +1,12 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Camera, X, Trash2, ImageIcon } from "lucide-react"
 import Image from "next/image"
-import {
-  addAdminStatus,
-  uploadStatusImage,
-  fetchAdminStatuses,
-  deleteAdminStatus,
-} from "@/lib/firestore"
+import { addAdminStatus, uploadStatusImage, fetchAdminStatuses, deleteAdminStatus } from "@/lib/firestore"
 import type { AdminStatus } from "@/types/interfaces"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/contexts/ToastContext"
@@ -52,9 +42,7 @@ export function StatusUpdateDialog() {
    * Maneja el cambio en el input de tipo file.
    * Sube la imagen y actualiza el progreso mediante el callback.
    */
-  const handleImageChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setIsLoading(true)
       try {
@@ -71,9 +59,7 @@ export function StatusUpdateDialog() {
         console.error("Error al subir imagen:", error)
         addToast({
           title: "Error",
-          description: `No se pudo subir la imagen: ${
-            error instanceof Error ? error.message : "Error desconocido"
-          }`,
+          description: `No se pudo subir la imagen: ${error instanceof Error ? error.message : "Error desconocido"}`,
           variant: "destructive",
         })
       } finally {
@@ -147,12 +133,7 @@ export function StatusUpdateDialog() {
   return (
     <>
       {/* Botón para abrir el diálogo */}
-      <Button
-        variant="ghost"
-        size="icon"
-        className="text-[#aebac1]"
-        onClick={() => setIsOpen(true)}
-      >
+      <Button variant="ghost" size="icon" className="text-[#aebac1]" onClick={() => setIsOpen(true)}>
         <Camera className="h-5 w-5" />
       </Button>
 
@@ -184,9 +165,7 @@ export function StatusUpdateDialog() {
               ) : (
                 <label className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-[#2a3942] transition-colors">
                   <ImageIcon className="h-12 w-12 text-[#00a884] mb-2" />
-                  <span className="text-[#8696a0]">
-                    Haz clic para subir una imagen
-                  </span>
+                  <span className="text-[#8696a0]">Haz clic para subir una imagen</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -201,9 +180,7 @@ export function StatusUpdateDialog() {
             {/* Indicador de progreso mientras se carga la imagen */}
             {uploadProgress > 0 && uploadProgress < 100 && (
               <div className="space-y-2">
-                <div className="text-sm text-[#8696a0] text-center">
-                  Subiendo imagen...
-                </div>
+                <div className="text-sm text-[#8696a0] text-center">Subiendo imagen...</div>
                 <Progress value={uploadProgress} className="w-full" />
               </div>
             )}
@@ -233,15 +210,10 @@ export function StatusUpdateDialog() {
             {/* Listado de estados activos */}
             {statuses.length > 0 && (
               <div className="space-y-2">
-                <h3 className="text-[#8696a0] text-sm font-medium">
-                  Estados Activos ({statuses.length})
-                </h3>
+                <h3 className="text-[#8696a0] text-sm font-medium">Estados Activos ({statuses.length})</h3>
                 <div className="space-y-2 max-h-[300px] overflow-y-auto">
                   {statuses.map((status) => (
-                    <div
-                      key={status.id}
-                      className="flex items-center gap-3 bg-[#202c33] p-3 rounded-lg"
-                    >
+                    <div key={status.id} className="flex items-center gap-3 bg-[#202c33] p-3 rounded-lg">
                       <div className="relative w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
                         <Image
                           src={status.imageUrl || "/placeholder.svg"}
@@ -252,12 +224,10 @@ export function StatusUpdateDialog() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[#e9edef] truncate">
-                          {status.caption}
+                        <p className="text-[#e9edef] break-words" title={status.caption}>
+                          {status.caption.length > 50 ? `${status.caption.slice(0, 50)}...` : status.caption}
                         </p>
-                        <p className="text-xs text-[#8696a0]">
-                          {new Date(status.timestamp).toLocaleString()}
-                        </p>
+                        <p className="text-xs text-[#8696a0]">{new Date(status.timestamp).toLocaleString()}</p>
                       </div>
                       <Button
                         variant="ghost"

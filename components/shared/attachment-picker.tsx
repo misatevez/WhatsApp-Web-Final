@@ -35,48 +35,56 @@ export function AttachmentPicker({ show, onToggle, onFileSelect, disabled }: Att
     }
   }
 
-  const handleSend = async () => {
-    if (selectedFile && !isLoading) {
-      setIsLoading(true)
-      try {
-        const storageRef = ref(storage, `uploads/${Date.now()}_${selectedFile.name}`)
-        const uploadTask = uploadBytesResumable(storageRef, selectedFile)
-        
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            setUploadProgress(progress)
-          },
-          (error) => {
-            console.error("Error during upload:", error)
-            throw error
-          }
-        )
-        
-        await uploadTask
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-        
-        const type = selectedFile.type.startsWith("image/") ? "image" : "document"
-        await onFileSelect(downloadURL, type)
-        
-        if (comment.trim()) {
-          await onFileSelect(comment.trim(), "text")
+const handleSend = async () => {
+  if (selectedFile && !isLoading) {
+    setIsLoading(true)
+    try {
+      const storageRef = ref(storage, `uploads/${Date.now()}_${selectedFile.name}`)
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile)
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          setUploadProgress(progress)
+        },
+        (error) => {
+          console.error("Error during upload:", error)
+          throw error
         }
-        
-        setSelectedFile(null)
-        setPreviewUrl(null)
-        setShowPreview(false)
-        setComment("")
-        setUploadProgress(0)
-        onToggle(false)
-      } catch (error) {
-        console.error("Error uploading file:", error)
-      } finally {
-        setIsLoading(false)
+      )
+
+      await uploadTask
+      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+
+      const type = selectedFile.type.startsWith("image/") ? "image" : "document"
+      await onFileSelect(downloadURL, type)
+
+      if (comment.trim()) {
+        await onFileSelect(comment.trim(), "text")
       }
+
+      // Restablecer estado y cerrar modales
+      setSelectedFile(null)
+      setPreviewUrl(null)
+      setShowPreview(false)
+      setComment("")
+      setUploadProgress(0)
+
+      // Asegurarse de cerrar el Popover solo si está abierto
+      if (show) {
+        onToggle(false)
+      }
+
+    } catch (error) {
+      console.error("Error uploading file:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
+}
+
+
 
   return (
     <>
