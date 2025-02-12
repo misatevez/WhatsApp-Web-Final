@@ -11,7 +11,6 @@ import { collection, query, orderBy, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { uploadSticker } from "@/lib/firestore/stickers"
 import type { Message } from "@/types/interfaces"
-import ReactMarkdown from "react-markdown"
 
 // URL detection regex pattern
 const URL_PATTERN = /(?:https?:\/\/)?(?:www\.)?([^\s<]+\.[^\s<]+)/gi
@@ -27,10 +26,12 @@ const convertUrlsToLinks = (text: string) => {
   let i = 0
 
   matches.forEach((url, index) => {
+    // Add text before URL
     if (parts[i]) {
       result.push(parts[i])
     }
 
+    // Add URL as link
     const fullUrl = url.startsWith("http") ? url : `https://${url}`
     result.push(
       <a
@@ -47,6 +48,7 @@ const convertUrlsToLinks = (text: string) => {
     i += 2
   })
 
+  // Add remaining text
   if (parts[i]) {
     result.push(parts[i])
   }
@@ -82,8 +84,11 @@ export const MessageList = React.memo(
     const pathname = usePathname()
     const isAdminRoute = pathname?.startsWith("/admin")
 
+    // Subscribe to real-time message updates
     useEffect(() => {
       if (!chatId) return
+
+      console.log("Setting up real-time messages subscription for chat:", chatId)
 
       const messagesRef = collection(db, `chats/${chatId}/messages`)
       const q = query(messagesRef, orderBy("timestamp", "asc"))
@@ -104,18 +109,26 @@ export const MessageList = React.memo(
       messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
     }, [])
 
+    // Helper function to safely convert timestamp to milliseconds
     const getTimestampMillis = useCallback((timestamp: any): number => {
       if (!timestamp) return 0
+
+      // Handle Firestore Timestamp object
       if (timestamp && typeof timestamp === "object" && "seconds" in timestamp) {
         return timestamp.seconds * 1000 + (timestamp.nanoseconds || 0) / 1000000
       }
+
+      // Handle ISO string
       if (typeof timestamp === "string") {
         const date = new Date(timestamp)
         return isNaN(date.getTime()) ? 0 : date.getTime()
       }
+
+      // Handle Date object
       if (timestamp instanceof Date) {
         return timestamp.getTime()
       }
+
       return 0
     }, [])
 
@@ -129,8 +142,9 @@ export const MessageList = React.memo(
           const response = await fetch(imageUrl)
           const blob = await response.blob()
           const file = new File([blob], "sticker.webp", { type: "image/webp" })
-          await uploadSticker("default", file)
+          await uploadSticker("default", file) // Asumimos un pack "default" para simplificar
           console.log("Sticker added successfully")
+          // Aquí podrías añadir una notificación o feedback visual
         } catch (error) {
           console.error("Error adding sticker:", error)
         }
@@ -149,17 +163,28 @@ export const MessageList = React.memo(
           const messageTimestamp = getTimestampMillis(message.timestamp)
           const userResponseTimestamp = getTimestampMillis(lastMessageUserTimestamp)
           const adminReadTimestamp = getTimestampMillis(lastReadByAdmin)
+
           const isAdmin = currentUserId === "admin"
 
+          // For admin messages (isOutgoing = true)
           if (isAdmin && message.isOutgoing) {
+            // Message is marked as read if there's a user response after it
             const hasUserResponse = userResponseTimestamp > messageTimestamp
+
+            // Start with gray checkmarks, turn blue when read
             const checkmarkColor = message.status === "read" || hasUserResponse ? "text-[#53bdeb]" : "text-[#8696a0]"
+
             return <CheckCheck className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${checkmarkColor}`} />
           }
 
+          // For user messages (isOutgoing = false)
           if (!isAdmin && !message.isOutgoing) {
+            // Message is marked as read if admin has read it after it was sent
             const hasBeenRead = adminReadTimestamp > messageTimestamp
+
+            // Start with gray checkmarks, turn blue when read
             const checkmarkColor = message.status === "read" || hasBeenRead ? "text-[#53bdeb]" : "text-[#8696a0]"
+
             return <CheckCheck className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${checkmarkColor}`} />
           }
         } catch (error) {
@@ -181,10 +206,41 @@ export const MessageList = React.memo(
 
             return (
               <div key={message.id} className={`flex ${alignmentClass} mb-2 sm:mb-4`}>
-                <div className={`max-w-[85%] sm:max-w-[65%] rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${bubbleColorClass}`}>
-                  <ReactMarkdown className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap">
-                    {message.content}
-                  </ReactMarkdown>
+                <div
+                  className={`max-w-[85%] sm:max-w-[65%] rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${bubbleColorClass} ${
+                    chatSearchQuery ? "bg-[#0b3d36]" : ""
+                  }`}
+                >
+                  {message.type === "text" ? (
+                    <p className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap">
+                      {convertUrlsToLinks(message.content)}
+                    </p>
+                  ) : message.type === "sticker" ? (
+                    <img
+                      src={message.content || "/placeholder.svg"}
+                      alt="Sticker"
+                      className="w-32 h-32 object-contain"
+                    />
+                  ) : (
+                    <div className="relative group">
+                      <ThumbnailPreview
+                        content={message.content}
+                        type={message.type}
+                        filename={message.filename}
+                        onImageClick={handleImageClick}
+                      />
+                      {isAdminRoute && message.type === "image" && message.content.endsWith(".webp") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 bg-[rgba(0,0,0,0.5)] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleAddSticker(message.content)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  )}
 
                   <div className="flex items-center justify-end gap-1 mt-0.5 sm:mt-1">
                     <span className="text-[10px] sm:text-xs text-[#8696a0]">{formatTimestamp(message.timestamp)}</span>
@@ -196,9 +252,50 @@ export const MessageList = React.memo(
           })}
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Image Preview Dialog */}
+        <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
+          <DialogContent className="bg-[#111b21] border-none text-[#e9edef] max-w-4xl p-0">
+            <DialogHeader className="bg-[#202c33] px-4 py-3 flex-row items-center justify-between">
+              <DialogTitle>Vista previa</DialogTitle>
+              <div className="flex items-center space-x-2">
+                {isAdminRoute && selectedImage?.endsWith(".webp") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (selectedImage) handleAddSticker(selectedImage)
+                    }}
+                    className="text-[#00a884] hover:text-[#00a884] hover:bg-[rgba(0,168,132,0.1)]"
+                  >
+                    Agregar como sticker
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedImage(null)}
+                  className="text-[#aebac1] hover:text-[#e9edef]"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+            </DialogHeader>
+            {selectedImage && (
+              <div className="relative aspect-auto max-h-[80vh] w-full">
+                <img
+                  src={selectedImage || "/placeholder.svg"}
+                  alt="Vista previa"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </>
     )
   },
 )
 
 MessageList.displayName = "MessageList"
+
