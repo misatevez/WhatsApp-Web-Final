@@ -61,7 +61,7 @@
     "@types/react": "latest",
     "@types/react-dom": "latest",
     "firebase": "latest",
-    "twilio": "latest",
+    "axios": "latest",
     "emoji-picker-react": "latest"
   },
   "devDependencies": {

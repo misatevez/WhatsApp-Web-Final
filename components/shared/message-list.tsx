@@ -1,13 +1,15 @@
 "use client"
 
 import React, { useEffect, useRef, useState, useCallback } from "react"
+import { usePathname } from "next/navigation"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { X, CheckCheck } from "lucide-react"
+import { X, CheckCheck, Plus } from "lucide-react"
 import { ThumbnailPreview } from "./thumbnail-preview"
 import { formatTimestamp } from "@/lib/utils"
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
+import { uploadSticker } from "@/lib/firestore/stickers"
 import type { Message } from "@/types/interfaces"
 
 // URL detection regex pattern
@@ -79,6 +81,8 @@ export const MessageList = React.memo(
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const [messages, setMessages] = useState<Message[]>(initialMessages)
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
+    const pathname = usePathname()
+    const isAdminRoute = pathname?.startsWith("/admin")
 
     // Subscribe to real-time message updates
     useEffect(() => {
@@ -130,6 +134,21 @@ export const MessageList = React.memo(
 
     const handleImageClick = (imageUrl: string) => {
       setSelectedImage(imageUrl)
+    }
+
+    const handleAddSticker = async (imageUrl: string) => {
+      if (isAdminRoute) {
+        try {
+          const response = await fetch(imageUrl)
+          const blob = await response.blob()
+          const file = new File([blob], "sticker.webp", { type: "image/webp" })
+          await uploadSticker("default", file) // Asumimos un pack "default" para simplificar
+          console.log("Sticker added successfully")
+          // Aquí podrías añadir una notificación o feedback visual
+        } catch (error) {
+          console.error("Error adding sticker:", error)
+        }
+      }
     }
 
     const filteredMessages = chatSearchQuery
@@ -196,13 +215,31 @@ export const MessageList = React.memo(
                     <p className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap">
                       {convertUrlsToLinks(message.content)}
                     </p>
-                  ) : (
-                    <ThumbnailPreview
-                      content={message.content}
-                      type={message.type}
-                      filename={message.filename}
-                      onImageClick={handleImageClick}
+                  ) : message.type === "sticker" ? (
+                    <img
+                      src={message.content || "/placeholder.svg"}
+                      alt="Sticker"
+                      className="w-32 h-32 object-contain"
                     />
+                  ) : (
+                    <div className="relative group">
+                      <ThumbnailPreview
+                        content={message.content}
+                        type={message.type}
+                        filename={message.filename}
+                        onImageClick={handleImageClick}
+                      />
+                      {isAdminRoute && message.type === "image" && message.content.endsWith(".webp") && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="absolute top-2 right-2 bg-[rgba(0,0,0,0.5)] text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={() => handleAddSticker(message.content)}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   )}
 
                   <div className="flex items-center justify-end gap-1 mt-0.5 sm:mt-1">
@@ -221,14 +258,28 @@ export const MessageList = React.memo(
           <DialogContent className="bg-[#111b21] border-none text-[#e9edef] max-w-4xl p-0">
             <DialogHeader className="bg-[#202c33] px-4 py-3 flex-row items-center justify-between">
               <DialogTitle>Vista previa</DialogTitle>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setSelectedImage(null)}
-                className="text-[#aebac1] hover:text-[#e9edef]"
-              >
-                <X className="h-5 w-5" />
-              </Button>
+              <div className="flex items-center space-x-2">
+                {isAdminRoute && selectedImage?.endsWith(".webp") && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      if (selectedImage) handleAddSticker(selectedImage)
+                    }}
+                    className="text-[#00a884] hover:text-[#00a884] hover:bg-[rgba(0,168,132,0.1)]"
+                  >
+                    Agregar como sticker
+                  </Button>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setSelectedImage(null)}
+                  className="text-[#aebac1] hover:text-[#e9edef]"
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
             </DialogHeader>
             {selectedImage && (
               <div className="relative aspect-auto max-h-[80vh] w-full">

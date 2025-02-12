@@ -1,15 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, type React } from "react"
+import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Send } from "lucide-react"
 import { EmojiPickerComponent } from "./emoji-picker"
 import { AttachmentPicker } from "./attachment-picker"
+import { DynamicStickerPicker } from "./dynamic-sticker-picker"
 
 interface MessageInputProps {
   chatId: string
-  onSendMessage: (content: string, type: "text" | "image" | "document") => Promise<void>
+  onSendMessage: (content: string, type: "text" | "image" | "document" | "sticker") => Promise<void>
 }
 
 export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
@@ -17,6 +19,9 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [showAttachmentPicker, setShowAttachmentPicker] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const pathname = usePathname()
+
+  const isAdminRoute = pathname?.startsWith("/admin")
 
   const handleSendMessage = async () => {
     if (message.trim() && !isLoading) {
@@ -59,6 +64,19 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
     }
   }
 
+  const handleStickerSelect = async (stickerUrl: string) => {
+    if (!isLoading) {
+      setIsLoading(true)
+      try {
+        await onSendMessage(stickerUrl, "sticker")
+      } catch (error) {
+        console.error("Error sending sticker:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
@@ -86,6 +104,8 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
           onEmojiSelect={onEmojiSelect}
           disabled={isLoading}
         />
+
+        {isAdminRoute && <DynamicStickerPicker onStickerSelect={handleStickerSelect} disabled={isLoading} />}
 
         <div className="flex-1 min-w-0 px-1">
           <Input

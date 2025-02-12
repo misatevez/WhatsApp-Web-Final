@@ -65,7 +65,7 @@ export function IOSInstallPrompt() {
             {/* Preview Image */}
             <div className="relative aspect-[9/16] h-[120px] mx-auto">
               <Image
-                src="https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Fios-install.png?alt=media"
+                src="https://firebasestorage.googleapis.com/v0/b/cargatusfichas24hs.firebasestorage.app/o/admin%2Ffavicon%20final.png?alt=media&token=4bd18c29-affc-42fa-a281-17fb2cbb6143"
                 alt="iOS Install Steps"
                 fill
                 className="object-contain rounded-lg"

@@ -92,7 +92,7 @@ export default function Page() {
       if (data.success) {
         setSentCode(data.verificationCode.toString())
         setStep("code")
-        showAlert("success", "Código enviado. Revisa tu WhatsApp")
+        showAlert("success", "Código enviado. Revisa tus SMS")
       } else {
         throw new Error(data.error || "Error al enviar el código")
       }
