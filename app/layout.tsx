@@ -7,7 +7,8 @@ import type React from "react"
 
 const inter = Inter({ subsets: ["latin"] })
 
-const ICON_URL = "https://firebasestorage.googleapis.com/v0/b/cargatusfichas2.firebasestorage.app/o/admin%2Ffavicon%20final.png?alt=media&token=a737809b-73f8-458c-b839-bbc6a5843267"
+const ICON_URL =
+  "https://firebasestorage.googleapis.com/v0/b/cargatusfichas24hs.firebasestorage.app/o/admin%2Ffavicon%20final.png?alt=media&token=4bd18c29-affc-42fa-a281-17fb2cbb6143"
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -41,26 +42,26 @@ export const metadata: Metadata = {
       url: ICON_URL,
     },
   },
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full">
       <head>
-        <link rel="shortcut icon" type="image/png" href={ICON_URL} />
-        <link rel="icon" type="image/png" href={ICON_URL} />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="theme-color" content="#0b141a" />
-        <meta name="apple-mobile-web-app-title" content="Cargatusfichas.com" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no, minimal-ui"
         />
         <link rel="apple-touch-icon" href={ICON_URL} />
         <link rel="apple-touch-icon-precomposed" href={ICON_URL} />
+        <link rel="icon" type="image/png" href={ICON_URL} />
+        <link rel="manifest" href="/manifest.json" />
         <style>{`
           :root {
             background: #0b141a;
@@ -108,3 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+
+
+
+import './globals.css'
