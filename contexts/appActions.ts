@@ -2,7 +2,6 @@ import type { AppAction } from "../types/appTypes"
 import type { Chat, AdminProfile, Category, Message, UnknownContact } from "../types/interfaces"
 import {
   upsertChat,
-  addMessageToChat,
   updateAdminProfile as updateAdminProfileFirestore,
   addCategory as addCategoryFirestore,
   updateCategory as updateCategoryFirestore,

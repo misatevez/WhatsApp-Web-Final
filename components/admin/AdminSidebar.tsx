@@ -52,7 +52,7 @@ export function AdminSidebar({
       await auth.signOut()
       addToast({
         title: "Sesión cerrada",
-        description: "Has cerrado sesión correctamente"
+        description: "Has cerrado sesión correctamente",
       })
       router.push("/admin") // Redirect back to admin login
     } catch (error) {
@@ -60,24 +60,23 @@ export function AdminSidebar({
       addToast({
         title: "Error",
         description: "No se pudo cerrar la sesión",
-        variant: "destructive"
+        variant: "destructive",
       })
     }
   }
 
   const filteredChats = chats.filter((chat) => {
-    const matchesSearch = searchQuery ? (
-      (chat.name && chat.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      (chat.phoneNumber && chat.phoneNumber.includes(searchQuery)) ||
-      (chat.lastMessage && chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()))
-    ) : true
+    const matchesSearch = searchQuery
+      ? (chat.name && chat.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (chat.phoneNumber && chat.phoneNumber.includes(searchQuery)) ||
+        (chat.lastMessage && chat.lastMessage.toLowerCase().includes(searchQuery.toLowerCase()))
+      : true
 
     const matchesTab = activeTab === "contacts" ? Boolean(chat.isAgendado) : true
 
-    const matchesCategories = selectedCategories.length === 0 || (
-      chat.categories && 
-      chat.categories.some(catId => selectedCategories.includes(catId))
-    )
+    const matchesCategories =
+      selectedCategories.length === 0 ||
+      (chat.categories && chat.categories.some((catId) => selectedCategories.includes(catId)))
 
     return matchesSearch && matchesTab && matchesCategories
   })
@@ -105,12 +104,7 @@ export function AdminSidebar({
           <Button variant="ghost" size="icon" className="text-[#aebac1]" onClick={onOpenCategoryManagement}>
             <MessageSquare className="h-5 w-5 mx-auto" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-[#aebac1] hover:text-red-500"
-            onClick={handleLogout}
-          >
+          <Button variant="ghost" size="icon" className="text-[#aebac1] hover:text-red-500" onClick={handleLogout}>
             <LogOut className="h-5 w-5" />
           </Button>
         </div>
@@ -142,12 +136,12 @@ export function AdminSidebar({
       </div>
 
       <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-      <CategoryFilters 
-        categories={categories} 
-        selectedCategories={selectedCategories} 
+      <CategoryFilters
+        categories={categories}
+        selectedCategories={selectedCategories}
         onCategoryClick={(categoryId) => {
           if (selectedCategories.includes(categoryId)) {
-            dispatch(setSelectedCategories(selectedCategories.filter(id => id !== categoryId)))
+            dispatch(setSelectedCategories(selectedCategories.filter((id) => id !== categoryId)))
           } else {
             dispatch(setSelectedCategories([...selectedCategories, categoryId]))
           }

@@ -41,7 +41,7 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
 
 ¡Buena suerte y que la fortuna te acompañe en cada jugada! 🎲💰
 
-⚠️ Recuerda instalar el acceso rápido para poder cargar en todo momento y a toda velocidad!`;
+⚠️ Recuerda instalar el acceso rápido para poder cargar en todo momento y a toda velocidad!`
       await sendMessage(
         chatId,
         welcomeMessage,

@@ -1,6 +1,7 @@
 "use client"
 
-import React, { useEffect } from "react"
+import type React from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
@@ -12,21 +13,24 @@ import { sendWelcomeMessage } from "@/lib/firestore/messages"
 import { AlertCircle, CheckCircle2 } from "lucide-react"
 import { IOSInstallPrompt } from "@/components/shared/IOSInstallPrompt"
 import { InstallPWA } from "@/components/shared/InstallPWA"
+import { Label } from "@/components/ui/label"
 
 export default function Page() {
   const { toast } = useToast()
   const router = useRouter()
-  const [phoneNumber, setPhoneNumber] = React.useState("+54")
-  const [verificationCode, setVerificationCode] = React.useState("")
-  const [sentCode, setSentCode] = React.useState<string | null>(null)
-  const [step, setStep] = React.useState<"phone" | "code">("phone")
-  const [isLoading, setIsLoading] = React.useState(false)
-  const [alert, setAlert] = React.useState<{
+  const [areaCode, setAreaCode] = useState("")
+  const [localNumber, setLocalNumber] = useState("")
+  const [formattedNumber, setFormattedNumber] = useState("")
+  const [verificationCode, setVerificationCode] = useState("")
+  const [sentCode, setSentCode] = useState<string | null>(null)
+  const [step, setStep] = useState<"phone" | "code">("phone")
+  const [isLoading, setIsLoading] = useState(false)
+  const [alert, setAlert] = useState<{
     type: "error" | "success"
     message: string
   } | null>(null)
-  const [isIOS, setIsIOS] = React.useState(false)
-  const [isStandalone, setIsStandalone] = React.useState(false)
+  const [isIOS, setIsIOS] = useState(false)
+  const [isStandalone, setIsStandalone] = useState(false)
 
   useEffect(() => {
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -42,15 +46,29 @@ export default function Page() {
     }
   }, [router])
 
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value
+  const formatPhoneNumber = useCallback((code: string, number: string) => {
+    if (!code || !number) return ""
 
-    if (!value.startsWith("+54")) {
-      value = "+54"
+    const fullNumber = `+54 9 ${code} ${number.padEnd(8, "_")}`
+    return fullNumber.replace(/(\d{2})(\d{4})(\d{4})/, "$1 $2 $3")
+  }, [])
+
+  useEffect(() => {
+    setFormattedNumber(formatPhoneNumber(areaCode, localNumber))
+  }, [areaCode, localNumber, formatPhoneNumber])
+
+  const handleAreaCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "")
+    if (value.length <= 4) {
+      setAreaCode(value)
     }
+  }
 
-    const digits = value.slice(3).replace(/\D/g, "")
-    setPhoneNumber("+54" + digits)
+  const handleLocalNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "")
+    if (value.length <= 8) {
+      setLocalNumber(value)
+    }
   }
 
   const showAlert = (type: "error" | "success", message: string) => {
@@ -61,7 +79,8 @@ export default function Page() {
   const handleSendCode = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!phoneNumber.trim() || phoneNumber.length < 14) {
+    const fullNumber = `+549${areaCode}${localNumber}`
+    if (!fullNumber.trim() || fullNumber.length < 13) {
       showAlert("error", "Por favor ingresa un número de teléfono válido (Ej: +54 9 11 1234 5678)")
       return
     }
@@ -72,7 +91,7 @@ export default function Page() {
       const response = await fetch("/api/sendWhatsApp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phoneNumber: phoneNumber.trim() }),
+        body: JSON.stringify({ phoneNumber: fullNumber.trim() }),
       })
 
       let data
@@ -115,13 +134,14 @@ export default function Page() {
     if (verificationCode === sentCode) {
       try {
         setIsLoading(true)
-        const chatRef = doc(db, "chats", phoneNumber)
+        const fullNumber = `+54${areaCode}${localNumber}`
+        const chatRef = doc(db, "chats", fullNumber)
         const chatDoc = await getDoc(chatRef)
 
         if (!chatDoc.exists()) {
           await setDoc(chatRef, {
-            id: phoneNumber,
-            phoneNumber: phoneNumber,
+            id: fullNumber,
+            phoneNumber: fullNumber,
             name: "",
             lastMessage: "",
             timestamp: serverTimestamp(),
@@ -130,14 +150,14 @@ export default function Page() {
             createdAt: serverTimestamp(),
           })
 
-          await sendWelcomeMessage(phoneNumber)
+          await sendWelcomeMessage(fullNumber)
         }
 
-        localStorage.setItem("whatsapp_phone", phoneNumber)
+        localStorage.setItem("whatsapp_phone", fullNumber)
         showAlert("success", "¡Verificación exitosa!")
 
         setTimeout(() => {
-          router.push(`/chat?phone=${encodeURIComponent(phoneNumber)}`)
+          router.push(`/chat?phone=${encodeURIComponent(fullNumber)}`)
         }, 1500)
       } catch (error: any) {
         console.error("Error creating chat:", error)
@@ -180,20 +200,43 @@ export default function Page() {
 
         {step === "phone" ? (
           <form onSubmit={handleSendCode} className="space-y-4">
-            <Input
-              type="tel"
-              placeholder="+54 9 11 1234 5678"
-              value={phoneNumber}
-              onChange={handlePhoneNumberChange}
-              className="w-full h-12 bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] text-base"
-              maxLength={14}
-              disabled={isLoading}
-              autoFocus
-            />
+            <div className="w-full max-w-md bg-[#202c33] rounded-lg">
+              <Label htmlFor="phone-input" className="block text-sm font-medium text-[#e9edef] mb-2">
+                Número de teléfono
+              </Label>
+              <div className="flex items-center space-x-2 w-full mb-2">
+                <div className="flex-shrink-0 bg-[#2a3942] px-3 py-2 rounded-md text-[#e9edef] text-sm">+54 9</div>
+                <Input
+                  id="area-code-input"
+                  type="tel"
+                  placeholder="356"
+                  value={areaCode}
+                  onChange={handleAreaCodeChange}
+                  className="w-20 bg-[#2a3942] border-none text-[#e9edef] placeholder:text-[#8696a0] focus-visible:ring-1 focus-visible:ring-[#00a884]"
+                  maxLength={4}
+                  disabled={isLoading}
+                />
+                <Input
+                  id="phone-input"
+                  type="tel"
+                  placeholder="Su número sin 15 ni 11 (8 dígitos)"
+                  value={localNumber}
+                  onChange={handleLocalNumberChange}
+                  className="flex-grow bg-[#2a3942] border-none text-[#e9edef] placeholder:text-[#8696a0] focus-visible:ring-1 focus-visible:ring-[#00a884]"
+                  maxLength={8}
+                  disabled={isLoading}
+                />
+              </div>
+              {formattedNumber && (
+                <div className="text-sm text-[#8696a0] mt-2">
+                  Número completo: <span className="font-medium text-[#00a884]">{formattedNumber}</span>
+                </div>
+              )}
+            </div>
             <Button
               type="submit"
               className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold transition-all"
-              disabled={isLoading || phoneNumber.length < 13}
+              disabled={isLoading || areaCode.length < 2 || localNumber.length < 8}
             >
               {isLoading ? "Cargando..." : "Verificar número"}
             </Button>
@@ -205,7 +248,7 @@ export default function Page() {
               placeholder="Código de 6 dígitos"
               value={verificationCode}
               onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="w-full h-12 text-center text-xl tracking-[0.3em] font-mono bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] placeholder:text-base placeholder:tracking-normal"
+              className="w-full h-12 text-center text-xl tracking-[0.3em] font-mono bg-[#2a3942] text-[#d1d7db] placeholder:text-[#8696a0] placeholder:text-base placeholder:tracking-normal border-none focus-visible:ring-1 focus-visible:ring-[#00a884]"
               maxLength={6}
               autoFocus
             />

@@ -58,7 +58,7 @@ export function AdminProfileDialog({ profile, onUpdate, children }: AdminProfile
 
   const handleSave = async () => {
     if (!name.trim() || isLoading) return
-    
+
     setIsLoading(true)
     try {
       await updateAdminProfile({ name, about, avatar })
@@ -112,10 +112,7 @@ export function AdminProfileDialog({ profile, onUpdate, children }: AdminProfile
           <div className="space-y-2">
             <div className="text-sm text-[#8696a0] text-center">Subiendo imagen...</div>
             <Progress value={uploadProgress} className="h-1 bg-[#2a3942]">
-              <div 
-                className="h-full bg-[#00a884] transition-all" 
-                style={{ width: `${uploadProgress}%` }}
-              />
+              <div className="h-full bg-[#00a884] transition-all" style={{ width: `${uploadProgress}%` }} />
             </Progress>
           </div>
         )}

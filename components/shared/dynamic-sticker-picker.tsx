@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Sticker, Plus } from "lucide-react"
+import { Sticker } from "lucide-react"
 import { fetchStickerPacks, type StickerPack } from "@/lib/firestore/stickers"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -80,16 +80,14 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
           {/* Contenedor de stickers */}
           <ScrollArea className="h-[320px] p-2">
             {loading ? (
-              <div className="flex items-center justify-center h-full text-[#8696a0]">
-                Cargando stickers...
-              </div>
+              <div className="flex items-center justify-center h-full text-[#8696a0]">Cargando stickers...</div>
             ) : stickerPacks.length > 0 ? (
-              <div className="grid grid-cols-3 gap-2 justify-items-center">
+              <div className="grid grid-cols-2 gap-2 justify-items-center">
                 {stickerPacks[selectedPack]?.stickers.map((sticker) => (
                   <Button
                     key={sticker.id}
                     variant="ghost"
-                    className="p-1 aspect-square w-full max-w-[80px] rounded-md hover:bg-[#2f3b44] 
+                    className="p-1 h-20 aspect-square w-full max-w-[150px] rounded-md hover:bg-[#2f3b44] 
                     flex items-center justify-center"
                     onClick={() => handleStickerClick(sticker.url)}
                   >
@@ -103,9 +101,7 @@ export function DynamicStickerPicker({ onStickerSelect, disabled }: DynamicStick
                 ))}
               </div>
             ) : (
-              <div className="flex items-center justify-center h-full text-[#8696a0]">
-                No hay stickers disponibles
-              </div>
+              <div className="flex items-center justify-center h-full text-[#8696a0]">No hay stickers disponibles</div>
             )}
           </ScrollArea>
         </div>

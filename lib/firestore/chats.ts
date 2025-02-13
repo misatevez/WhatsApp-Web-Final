@@ -35,10 +35,14 @@ export async function upsertChat(chat: Chat): Promise<void> {
   console.log("upsertChat called with:", chat)
   const chatRef = doc(db, "chats", chat.id)
   try {
-    await setDoc(chatRef, {
-      ...chat,
-      updatedAt: serverTimestamp()
-    }, { merge: true })
+    await setDoc(
+      chatRef,
+      {
+        ...chat,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true },
+    )
     console.log("upsertChat successful")
   } catch (error) {
     console.error("Error in upsertChat:", error)
@@ -54,7 +58,7 @@ export async function editContact(chatId: string, newName: string, categories: s
       name: newName,
       categories: categories,
       isAgendado: true,
-      updatedAt: serverTimestamp()
+      updatedAt: serverTimestamp(),
     })
     console.log("editContact successful")
   } catch (error) {

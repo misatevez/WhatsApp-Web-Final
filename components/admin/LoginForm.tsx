@@ -42,10 +42,8 @@ export function LoginForm() {
             />
           </div>
         </div>
-        
-        <h2 className="text-[#e9edef] text-xl font-medium text-center mb-6">
-          Admin Login
-        </h2>
+
+        <h2 className="text-[#e9edef] text-xl font-medium text-center mb-6">Admin Login</h2>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
@@ -72,8 +70,8 @@ export function LoginForm() {
             required
             autoComplete="current-password"
           />
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full h-12 bg-[#00a884] hover:bg-[#02906f] text-white font-semibold"
             disabled={isLoading}
           >

@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState } from "react"
-import { onAuthStateChanged, User, setPersistence, browserLocalPersistence } from "firebase/auth"
+import { onAuthStateChanged, type User, setPersistence, browserLocalPersistence } from "firebase/auth"
 import { auth } from "@/lib/firebase"
 import { useRouter } from "next/navigation"
 
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
           setUser(user)
           setLoading(false)
-          
+
           // If user is authenticated, redirect to their chat
           if (user?.phoneNumber) {
             const phone = user.phoneNumber.replace("+", "")
@@ -44,11 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       })
   }, [router])
 
-  return (
-    <AuthContext.Provider value={{ user, loading }}>
-      {children}
-    </AuthContext.Provider>
-  )
+  return <AuthContext.Provider value={{ user, loading }}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

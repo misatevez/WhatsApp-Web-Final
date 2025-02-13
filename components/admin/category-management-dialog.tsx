@@ -10,11 +10,7 @@ import { useAppContext } from "@/contexts/AppContext"
 import { addCategory, updateCategory, deleteCategory } from "@/lib/firestore"
 import type { CategoryManagementDialogProps, Category } from "@/types/interfaces"
 
-export function CategoryManagementDialog({
-  categories,
-  isOpen,
-  onClose,
-}: CategoryManagementDialogProps) {
+export function CategoryManagementDialog({ categories, isOpen, onClose }: CategoryManagementDialogProps) {
   const [newCategory, setNewCategory] = useState({ name: "", color: "#00a884" })
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -31,15 +27,15 @@ export function CategoryManagementDialog({
         color: newCategory.color,
         count: 0,
       }
-      
+
       const categoryId = await addCategory(categoryData)
-      
+
       // Dispatch action to update global state
       dispatch({
         type: "ADD_CATEGORY",
-        payload: { ...categoryData, id: categoryId }
+        payload: { ...categoryData, id: categoryId },
       })
-      
+
       setNewCategory({ name: "", color: "#00a884" })
       addToast({
         title: "Éxito",
@@ -66,7 +62,7 @@ export function CategoryManagementDialog({
         name: editingCategory.name.trim(),
         color: editingCategory.color,
       })
-      
+
       // Dispatch action to update global state
       dispatch({
         type: "UPDATE_CATEGORY",
@@ -74,9 +70,9 @@ export function CategoryManagementDialog({
           id: editingCategory.id,
           name: editingCategory.name.trim(),
           color: editingCategory.color,
-        }
+        },
       })
-      
+
       setEditingCategory(null)
       addToast({
         title: "Éxito",
@@ -100,13 +96,13 @@ export function CategoryManagementDialog({
     setIsLoading(true)
     try {
       await deleteCategory(categoryId)
-      
+
       // Dispatch action to update global state
       dispatch({
         type: "DELETE_CATEGORY",
-        payload: categoryId
+        payload: categoryId,
       })
-      
+
       addToast({
         title: "Éxito",
         description: "Categoría eliminada correctamente",
@@ -128,16 +124,11 @@ export function CategoryManagementDialog({
       <DialogContent className="bg-[#111b21] border-none text-[#e9edef] max-w-md p-0">
         <DialogHeader className="bg-[#202c33] px-4 py-3 flex-row items-center justify-between">
           <DialogTitle>Gestionar Categorías</DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="text-[#aebac1] hover:text-[#e9edef]"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-[#aebac1] hover:text-[#e9edef]">
             <X className="h-5 w-5" />
           </Button>
         </DialogHeader>
-        
+
         <div className="p-4 space-y-4">
           <div className="space-y-2">
             <Input
@@ -205,18 +196,9 @@ export function CategoryManagementDialog({
                   style={{ backgroundColor: `${category.color}20` }}
                 >
                   <div className="flex items-center gap-2">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: category.color }}
-                    />
-                    <span className="font-medium text-[#e9edef]">
-                      {category.name}
-                    </span>
-                    {category.count > 0 && (
-                      <span className="text-xs text-[#8696a0]">
-                        ({category.count})
-                      </span>
-                    )}
+                    <div className="w-4 h-4 rounded-full" style={{ backgroundColor: category.color }} />
+                    <span className="font-medium text-[#e9edef]">{category.name}</span>
+                    {category.count > 0 && <span className="text-xs text-[#8696a0]">({category.count})</span>}
                   </div>
                   <div className="flex items-center gap-2">
                     <Button

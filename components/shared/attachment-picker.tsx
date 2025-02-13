@@ -35,56 +35,53 @@ export function AttachmentPicker({ show, onToggle, onFileSelect, disabled }: Att
     }
   }
 
-const handleSend = async () => {
-  if (selectedFile && !isLoading) {
-    setIsLoading(true)
-    try {
-      const storageRef = ref(storage, `uploads/${Date.now()}_${selectedFile.name}`)
-      const uploadTask = uploadBytesResumable(storageRef, selectedFile)
+  const handleSend = async () => {
+    if (selectedFile && !isLoading) {
+      setIsLoading(true)
+      try {
+        const storageRef = ref(storage, `uploads/${Date.now()}_${selectedFile.name}`)
+        const uploadTask = uploadBytesResumable(storageRef, selectedFile)
 
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-          setUploadProgress(progress)
-        },
-        (error) => {
-          console.error("Error during upload:", error)
-          throw error
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+            setUploadProgress(progress)
+          },
+          (error) => {
+            console.error("Error during upload:", error)
+            throw error
+          },
+        )
+
+        await uploadTask
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+
+        const type = selectedFile.type.startsWith("image/") ? "image" : "document"
+        await onFileSelect(downloadURL, type)
+
+        if (comment.trim()) {
+          await onFileSelect(comment.trim(), "text")
         }
-      )
 
-      await uploadTask
-      const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
+        // Restablecer estado y cerrar modales
+        setSelectedFile(null)
+        setPreviewUrl(null)
+        setShowPreview(false)
+        setComment("")
+        setUploadProgress(0)
 
-      const type = selectedFile.type.startsWith("image/") ? "image" : "document"
-      await onFileSelect(downloadURL, type)
-
-      if (comment.trim()) {
-        await onFileSelect(comment.trim(), "text")
+        // Asegurarse de cerrar el Popover solo si está abierto
+        if (show) {
+          onToggle(false)
+        }
+      } catch (error) {
+        console.error("Error uploading file:", error)
+      } finally {
+        setIsLoading(false)
       }
-
-      // Restablecer estado y cerrar modales
-      setSelectedFile(null)
-      setPreviewUrl(null)
-      setShowPreview(false)
-      setComment("")
-      setUploadProgress(0)
-
-      // Asegurarse de cerrar el Popover solo si está abierto
-      if (show) {
-        onToggle(false)
-      }
-
-    } catch (error) {
-      console.error("Error uploading file:", error)
-    } finally {
-      setIsLoading(false)
     }
   }
-}
-
-
 
   return (
     <>
@@ -110,7 +107,13 @@ const handleSend = async () => {
             <label className="flex items-center gap-3 px-3 py-2 hover:bg-[#182229] cursor-pointer rounded transition-colors">
               <Camera className="h-5 w-5 text-[#8696a0]" />
               <span className="text-[#d1d7db] text-sm">Cámara</span>
-              <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleFileChange} />
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handleFileChange}
+              />
             </label>
             <label className="flex items-center gap-3 px-3 py-2 hover:bg-[#182229] cursor-pointer rounded transition-colors">
               <File className="h-5 w-5 text-[#8696a0]" />
@@ -137,9 +140,7 @@ const handleSend = async () => {
                 <span className="text-[#d1d7db] text-sm">Vista previa no disponible</span>
               </div>
             )}
-            {uploadProgress > 0 && uploadProgress < 100 && (
-              <Progress value={uploadProgress} className="w-full" />
-            )}
+            {uploadProgress > 0 && uploadProgress < 100 && <Progress value={uploadProgress} className="w-full" />}
             <div className="flex items-center gap-2">
               <Input
                 value={comment}
@@ -148,11 +149,7 @@ const handleSend = async () => {
                 className="flex-grow bg-[#2a3942] border-none text-[#d1d7db] placeholder:text-[#8696a0]"
                 disabled={isLoading}
               />
-              <Button 
-                onClick={handleSend} 
-                className="bg-[#00a884] hover:bg-[#02906f]"
-                disabled={isLoading}
-              >
+              <Button onClick={handleSend} className="bg-[#00a884] hover:bg-[#02906f]" disabled={isLoading}>
                 {isLoading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (

@@ -65,9 +65,7 @@ export function BlockUnblockDialog({ isOpen, onClose, contact, onBlockStatusChan
               : `¿Estás seguro que deseas bloquear a ${contact.name}?`}
           </p>
           <p className="text-sm text-[#8696a0]">
-            {contact.isBlocked
-              ? "Podrá enviarte mensajes nuevamente."
-              : "No podrá enviarte más mensajes."}
+            {contact.isBlocked ? "Podrá enviarte mensajes nuevamente." : "No podrá enviarte más mensajes."}
           </p>
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={onClose} disabled={isLoading}>

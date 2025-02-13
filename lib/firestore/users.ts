@@ -11,11 +11,11 @@ export async function fetchUserProfile(phoneNumber: string): Promise<UserProfile
 
     const userRef = doc(db, "users", phoneNumber)
     const userDoc = await getDoc(userRef)
-    
+
     if (userDoc.exists()) {
       return {
         id: userDoc.id,
-        ...userDoc.data()
+        ...userDoc.data(),
       } as UserProfile
     }
     return null
@@ -25,10 +25,7 @@ export async function fetchUserProfile(phoneNumber: string): Promise<UserProfile
   }
 }
 
-export async function updateUserProfile(
-  phoneNumber: string, 
-  updates: Partial<UserProfile>
-): Promise<void> {
+export async function updateUserProfile(phoneNumber: string, updates: Partial<UserProfile>): Promise<void> {
   try {
     if (!phoneNumber) {
       throw new Error("Phone number is required")
@@ -39,20 +36,23 @@ export async function updateUserProfile(
     const chatRef = doc(db, "chats", phoneNumber)
 
     // Clean updates by removing undefined/null values and validating data
-    const cleanUpdates = Object.entries(updates).reduce((acc, [key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        // Convert any non-string values to string to avoid Firebase errors
-        acc[key] = typeof value === 'string' ? value : String(value)
-      }
-      return acc
-    }, {} as Record<string, any>)
+    const cleanUpdates = Object.entries(updates).reduce(
+      (acc, [key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+          // Convert any non-string values to string to avoid Firebase errors
+          acc[key] = typeof value === "string" ? value : String(value)
+        }
+        return acc
+      },
+      {} as Record<string, any>,
+    )
 
     // Add required fields
     const timestamp = serverTimestamp()
     const userUpdates = {
       phoneNumber, // Always include phoneNumber
       ...cleanUpdates,
-      updatedAt: timestamp
+      updatedAt: timestamp,
     }
 
     // Only include relevant fields for chat update
@@ -60,20 +60,20 @@ export async function updateUserProfile(
       ...(cleanUpdates.name && { name: cleanUpdates.name }),
       ...(cleanUpdates.avatar && { userAvatar: cleanUpdates.avatar }),
       ...(cleanUpdates.about && { about: cleanUpdates.about }),
-      updatedAt: timestamp
+      updatedAt: timestamp,
     }
 
     // Check if user exists first
     const userDoc = await getDoc(userRef)
-    
+
     if (!userDoc.exists()) {
       // Create new user with initial data
       await setDoc(userRef, {
         ...userUpdates,
         createdAt: timestamp,
-        name: cleanUpdates.name || '',
-        about: cleanUpdates.about || '¡Hola! Estoy usando WhatsApp',
-        avatar: cleanUpdates.avatar || ''
+        name: cleanUpdates.name || "",
+        about: cleanUpdates.about || "¡Hola! Estoy usando WhatsApp",
+        avatar: cleanUpdates.avatar || "",
       })
     } else {
       // Update existing user
@@ -87,7 +87,6 @@ export async function updateUserProfile(
         await updateDoc(chatRef, chatUpdates)
       }
     }
-
   } catch (error) {
     console.error("Error updating user profile:", error)
     throw error
@@ -97,24 +96,24 @@ export async function updateUserProfile(
 export async function uploadUserAvatar(
   phoneNumber: string,
   file: File,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ): Promise<string> {
   try {
     if (!phoneNumber || !file) {
       throw new Error("Phone number and file are required")
     }
 
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       throw new Error("File must be an image")
     }
 
     // Create unique filename
-    const fileExtension = file.name.split('.').pop() || 'jpg'
+    const fileExtension = file.name.split(".").pop() || "jpg"
     const filename = `avatar_${Date.now()}.${fileExtension}`
     const storageRef = ref(storage, `users/${phoneNumber}/avatars/${filename}`)
-    
+
     const uploadTask = uploadBytesResumable(storageRef, file)
-    
+
     return new Promise((resolve, reject) => {
       uploadTask.on(
         "state_changed",
@@ -131,18 +130,18 @@ export async function uploadUserAvatar(
         async () => {
           try {
             const downloadURL = await getDownloadURL(uploadTask.snapshot.ref)
-            
+
             // Update profile with new avatar URL
             await updateUserProfile(phoneNumber, {
-              avatar: downloadURL
+              avatar: downloadURL,
             })
-            
+
             resolve(downloadURL)
           } catch (error) {
             console.error("Error getting download URL:", error)
             reject(error)
           }
-        }
+        },
       )
     })
   } catch (error) {

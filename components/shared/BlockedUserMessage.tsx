@@ -28,11 +28,9 @@ export function BlockedUserMessage() {
             className="opacity-60"
           />
         </div>
-        
-        <h2 className="text-[#e9edef] text-xl font-medium">
-          Acceso Bloqueado
-        </h2>
-        
+
+        <h2 className="text-[#e9edef] text-xl font-medium">Acceso Bloqueado</h2>
+
         <p className="text-[#8696a0]">
           Lo sentimos, pero tu acceso ha sido bloqueado. Serás redirigido a la página principal en unos segundos.
         </p>

@@ -12,10 +12,8 @@ import { db } from "@/lib/firebase"
 import { uploadSticker } from "@/lib/firestore/stickers"
 import type { Message } from "@/types/interfaces"
 
-// URL detection regex pattern
 const URL_PATTERN = /(?:https?:\/\/)?(?:www\.)?([^\s<]+\.[^\s<]+)/gi
 
-// Function to convert URLs to clickable links
 const convertUrlsToLinks = (text: string) => {
   const parts = text.split(URL_PATTERN)
   const matches = text.match(URL_PATTERN)
@@ -26,12 +24,10 @@ const convertUrlsToLinks = (text: string) => {
   let i = 0
 
   matches.forEach((url, index) => {
-    // Add text before URL
     if (parts[i]) {
       result.push(parts[i])
     }
 
-    // Add URL as link
     const fullUrl = url.startsWith("http") ? url : `https://${url}`
     result.push(
       <a
@@ -48,7 +44,6 @@ const convertUrlsToLinks = (text: string) => {
     i += 2
   })
 
-  // Add remaining text
   if (parts[i]) {
     result.push(parts[i])
   }
@@ -65,6 +60,7 @@ interface MessageListProps {
   invertOutgoing?: boolean
   lastMessageUserTimestamp?: string | null
   lastReadByAdmin?: any
+  scrollToBottom: boolean
 }
 
 export const MessageList = React.memo(
@@ -77,6 +73,7 @@ export const MessageList = React.memo(
     invertOutgoing = false,
     lastMessageUserTimestamp,
     lastReadByAdmin,
+    scrollToBottom,
   }: MessageListProps) => {
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -84,7 +81,6 @@ export const MessageList = React.memo(
     const pathname = usePathname()
     const isAdminRoute = pathname?.startsWith("/admin")
 
-    // Subscribe to real-time message updates
     useEffect(() => {
       if (!chatId) return
 
@@ -106,25 +102,23 @@ export const MessageList = React.memo(
     }, [chatId])
 
     useEffect(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [])
+      if (scrollToBottom) {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      }
+    }, [scrollToBottom])
 
-    // Helper function to safely convert timestamp to milliseconds
     const getTimestampMillis = useCallback((timestamp: any): number => {
       if (!timestamp) return 0
 
-      // Handle Firestore Timestamp object
       if (timestamp && typeof timestamp === "object" && "seconds" in timestamp) {
         return timestamp.seconds * 1000 + (timestamp.nanoseconds || 0) / 1000000
       }
 
-      // Handle ISO string
       if (typeof timestamp === "string") {
         const date = new Date(timestamp)
         return isNaN(date.getTime()) ? 0 : date.getTime()
       }
 
-      // Handle Date object
       if (timestamp instanceof Date) {
         return timestamp.getTime()
       }
@@ -142,9 +136,8 @@ export const MessageList = React.memo(
           const response = await fetch(imageUrl)
           const blob = await response.blob()
           const file = new File([blob], "sticker.webp", { type: "image/webp" })
-          await uploadSticker("default", file) // Asumimos un pack "default" para simplificar
+          await uploadSticker("default", file)
           console.log("Sticker added successfully")
-          // Aquí podrías añadir una notificación o feedback visual
         } catch (error) {
           console.error("Error adding sticker:", error)
         }
@@ -166,23 +159,17 @@ export const MessageList = React.memo(
 
           const isAdmin = currentUserId === "admin"
 
-          // For admin messages (isOutgoing = true)
           if (isAdmin && message.isOutgoing) {
-            // Message is marked as read if there's a user response after it
             const hasUserResponse = userResponseTimestamp > messageTimestamp
 
-            // Start with gray checkmarks, turn blue when read
             const checkmarkColor = message.status === "read" || hasUserResponse ? "text-[#53bdeb]" : "text-[#8696a0]"
 
             return <CheckCheck className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${checkmarkColor}`} />
           }
 
-          // For user messages (isOutgoing = false)
           if (!isAdmin && !message.isOutgoing) {
-            // Message is marked as read if admin has read it after it was sent
             const hasBeenRead = adminReadTimestamp > messageTimestamp
 
-            // Start with gray checkmarks, turn blue when read
             const checkmarkColor = message.status === "read" || hasBeenRead ? "text-[#53bdeb]" : "text-[#8696a0]"
 
             return <CheckCheck className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${checkmarkColor}`} />
@@ -207,9 +194,9 @@ export const MessageList = React.memo(
             return (
               <div key={message.id} className={`flex ${alignmentClass} mb-2 sm:mb-4`}>
                 <div
-                  className={`max-w-[85%] sm:max-w-[65%] rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${bubbleColorClass} ${
-                    chatSearchQuery ? "bg-[#0b3d36]" : ""
-                  }`}
+                  className={`max-w-[85%] sm:max-w-[65%] rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 ${
+                    message.type === "sticker" ? "" : bubbleColorClass
+                  } ${chatSearchQuery ? "bg-[#0b3d36]" : ""}`}
                 >
                   {message.type === "text" ? (
                     <p className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap">
@@ -253,7 +240,6 @@ export const MessageList = React.memo(
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Image Preview Dialog */}
         <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
           <DialogContent className="bg-[#111b21] border-none text-[#e9edef] max-w-4xl p-0">
             <DialogHeader className="bg-[#202c33] px-4 py-3 flex-row items-center justify-between">

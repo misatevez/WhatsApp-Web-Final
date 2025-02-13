@@ -9,9 +9,9 @@ export function ToastContainer() {
   return (
     <>
       {toasts.map(({ id, title, description, action, ...props }) => (
-        <Toast 
-          key={id} 
-          {...props} 
+        <Toast
+          key={id}
+          {...props}
           onOpenChange={(open) => !open && removeToast(id)}
           className="bg-[#202c33] border-[#2a3942] text-[#e9edef]"
         >

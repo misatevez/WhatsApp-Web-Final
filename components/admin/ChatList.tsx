@@ -83,7 +83,7 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
         const badgeCount = chat.unreadCount ?? 0
         const nameClass = badgeCount > 0 ? "text-white font-bold" : "text-[#e9edef] font-medium"
         const lastMessageClass = badgeCount > 0 ? "text-[#e9edef] font-bold" : "text-[#8696a0]"
-        
+
         // Se utiliza el avatar disponible
         const avatarUrl = chat.userAvatar || chat.photoURL || chat.avatar || DEFAULT_AVATAR
 

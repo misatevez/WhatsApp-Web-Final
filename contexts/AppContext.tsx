@@ -18,12 +18,7 @@ import { DEFAULT_AVATAR } from "@/constants/constants"
 
 // Importaciones de Firestore para hacer la suscripción
 import { db } from "@/lib/firebase"
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-} from "firebase/firestore"
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore"
 
 const initialState: AppState = {
   chats: [],
@@ -35,10 +30,13 @@ const initialState: AppState = {
   selectedCategories: [],
 }
 
-const AppContext = createContext<{
-  state: AppState
-  dispatch: React.Dispatch<AppAction>
-} | undefined>(undefined)
+const AppContext = createContext<
+  | {
+      state: AppState
+      dispatch: React.Dispatch<AppAction>
+    }
+  | undefined
+>(undefined)
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState)
@@ -48,8 +46,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const loadInitialData = async () => {
       try {
         const [chats, adminProfile, categories, unknownContacts] = await Promise.all([
-          fetchChats(),         // << Suele ser redundante si luego suscribes en tiempo real, 
-          fetchAdminProfile(),  //    pero puedes dejarlo si quieres mostrar algo inmediato
+          fetchChats(), // << Suele ser redundante si luego suscribes en tiempo real,
+          fetchAdminProfile(), //    pero puedes dejarlo si quieres mostrar algo inmediato
           fetchCategories(),
           fetchUnknownContacts(),
         ])
@@ -105,11 +103,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [])
 
-  return (
-    <AppContext.Provider value={{ state, dispatch }}>
-      {children}
-    </AppContext.Provider>
-  )
+  return <AppContext.Provider value={{ state, dispatch }}>{children}</AppContext.Provider>
 }
 
 export const useAppContext = () => {

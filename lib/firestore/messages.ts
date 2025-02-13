@@ -12,7 +12,6 @@ import {
   getDocs,
   limit,
   increment,
-  where,
 } from "firebase/firestore"
 
 export const sendMessage = async (
@@ -20,7 +19,7 @@ export const sendMessage = async (
   content: string,
   isOutgoing: boolean,
   type: "text" | "image" | "document" = "text",
-  filename?: string
+  filename?: string,
 ): Promise<string> => {
   if (!chatId || !content.trim()) {
     console.error("[sendMessage] Invalid parameters:", { chatId, content })
@@ -29,7 +28,7 @@ export const sendMessage = async (
 
   try {
     console.log("[sendMessage] Sending message:", { chatId, content, isOutgoing, type })
-    
+
     // Create message object with proper UTF-8 encoding for emojis
     const messageData = {
       content: content.trim(),
@@ -40,15 +39,15 @@ export const sendMessage = async (
       receipts: {
         sent: new Date().toISOString(),
         delivered: null,
-        read: null
+        read: null,
       },
-      ...(filename && { filename })
+      ...(filename && { filename }),
     }
-    
+
     // Add message to messages subcollection
     const messagesRef = collection(db, `chats/${chatId}/messages`)
     const docRef = await addDoc(messagesRef, messageData)
-    
+
     // Update chat metadata
     const chatRef = doc(db, "chats", chatId)
     await updateDoc(chatRef, {
@@ -56,9 +55,9 @@ export const sendMessage = async (
       timestamp: serverTimestamp(),
       [`lastMessage${isOutgoing ? "Admin" : "User"}`]: content.trim(),
       [`lastMessage${isOutgoing ? "Admin" : "User"}Timestamp`]: serverTimestamp(),
-      ...(isOutgoing ? {} : { unreadCount: increment(1) })
+      ...(isOutgoing ? {} : { unreadCount: increment(1) }),
     })
-    
+
     console.log("[sendMessage] Message sent successfully:", docRef.id)
     return docRef.id
   } catch (error) {
@@ -82,13 +81,13 @@ export const sendWelcomeMessage = async (chatId: string): Promise<void> => {
     // Only send welcome message if there are no messages
     if (snapshot.empty) {
       console.log("[sendWelcomeMessage] Sending welcome message to chat:", chatId)
-      
+
       // Send welcome message using the constant
       const messageId = await sendMessage(
         chatId,
         WELCOME_MESSAGE,
         true, // isOutgoing true for admin messages
-        "text"
+        "text",
       )
 
       // Update chat metadata
@@ -98,7 +97,7 @@ export const sendWelcomeMessage = async (chatId: string): Promise<void> => {
         lastMessageAdmin: WELCOME_MESSAGE,
         lastMessageAdminTimestamp: serverTimestamp(),
         timestamp: serverTimestamp(),
-        unreadCount: 0 // Reset unread count for welcome message
+        unreadCount: 0, // Reset unread count for welcome message
       })
 
       console.log("[sendWelcomeMessage] Welcome message sent successfully:", messageId)
@@ -116,7 +115,7 @@ export const resetUnreadCount = async (chatId: string): Promise<void> => {
     const chatRef = doc(db, "chats", chatId)
     await updateDoc(chatRef, {
       unreadCount: 0,
-      lastReadByAdmin: serverTimestamp()
+      lastReadByAdmin: serverTimestamp(),
     })
 
     // Get all unread messages
@@ -131,12 +130,11 @@ export const resetUnreadCount = async (chatId: string): Promise<void> => {
       if (!messageData.isOutgoing && messageData.status !== "read") {
         batch.update(doc.ref, {
           status: "read",
-          "receipts.read": serverTimestamp()
+          "receipts.read": serverTimestamp(),
         })
       }
     })
     await batch.commit()
-
   } catch (error) {
     console.error("[resetUnreadCount] Error:", error)
     throw error
@@ -155,18 +153,18 @@ export const markMessagesAsRead = async (chatId: string, lastMessageId: string):
       if (doc.id <= lastMessageId && !messageData.isOutgoing && messageData.status !== "read") {
         batch.update(doc.ref, {
           status: "read",
-          "receipts.read": serverTimestamp()
+          "receipts.read": serverTimestamp(),
         })
       }
     })
 
     await batch.commit()
-    
+
     const chatRef = doc(db, "chats", chatId)
     await updateDoc(chatRef, {
       unreadCount: 0,
       lastReadMessageId: lastMessageId,
-      lastReadByAdmin: serverTimestamp()
+      lastReadByAdmin: serverTimestamp(),
     })
   } catch (error) {
     console.error("[markMessagesAsRead] Error:", error)

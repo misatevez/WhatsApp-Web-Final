@@ -3,13 +3,7 @@ import { storage } from "../firebase"
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 export function formatTimestamp(
-  timestamp?:
-    | Timestamp
-    | Date
-    | string
-    | number
-    | { seconds: number; nanoseconds: number }
-    | null
+  timestamp?: Timestamp | Date | string | number | { seconds: number; nanoseconds: number } | null,
 ): string {
   if (!timestamp) return "Sin hora"
 
@@ -54,17 +48,17 @@ export function formatDate(input: string | number): string {
 
 export async function uploadFile(file: File, onProgress?: (progress: number) => void): Promise<string> {
   const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`)
-  
+
   try {
     const uploadTask = uploadBytes(storageRef, file)
-    
+
     if (onProgress) {
       uploadTask.on("state_changed", (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         onProgress(progress)
       })
     }
-    
+
     await uploadTask
     const downloadURL = await getDownloadURL(storageRef)
     return downloadURL

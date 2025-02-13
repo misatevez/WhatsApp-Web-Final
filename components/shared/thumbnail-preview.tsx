@@ -1,6 +1,4 @@
 "use client"
-
-import Image from "next/image"
 import { Download } from "lucide-react"
 
 interface ThumbnailPreviewProps {
@@ -13,16 +11,9 @@ interface ThumbnailPreviewProps {
 export function ThumbnailPreview({ content, type, filename, onImageClick }: ThumbnailPreviewProps) {
   if (type === "image") {
     return (
-      <div 
-        className="cursor-pointer group relative max-w-[300px]"
-        onClick={() => onImageClick?.(content)}
-      >
+      <div className="cursor-pointer group relative max-w-[300px]" onClick={() => onImageClick?.(content)}>
         <div className="relative aspect-auto max-h-[300px] w-full overflow-hidden rounded-lg">
-          <img
-            src={content}
-            alt="Vista previa"
-            className="w-full h-full object-contain"
-          />
+          <img src={content} alt="Vista previa" className="w-full h-full object-contain" />
         </div>
         <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg" />
       </div>
@@ -31,9 +22,7 @@ export function ThumbnailPreview({ content, type, filename, onImageClick }: Thum
 
   if (type === "document") {
     return (
-      <div
-        className="flex items-center bg-[#2a3942] rounded-lg p-3 hover:bg-[#3a4952] transition-colors cursor-pointer group"
-      >
+      <div className="flex items-center bg-[#2a3942] rounded-lg p-3 hover:bg-[#3a4952] transition-colors cursor-pointer group">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
             <svg
@@ -56,7 +45,7 @@ export function ThumbnailPreview({ content, type, filename, onImageClick }: Thum
             </div>
           </div>
         </div>
-        <a 
+        <a
           href={content}
           target="_blank"
           rel="noopener noreferrer"

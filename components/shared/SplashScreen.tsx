@@ -1,7 +1,4 @@
-"use client";
-
-import Image from "next/image";
-import { useEffect, useState } from "react";
+"use client"
 
 export default function SplashScreen() {
   return (
@@ -17,11 +14,9 @@ export default function SplashScreen() {
         }}
       />
 
-
-
       {/* Loader animado */}
       <div className="w-12 h-12 border-4 border-[#00a884] border-t-transparent rounded-full animate-spin z-10" />
     </div>
-  );
+  )
 }
 

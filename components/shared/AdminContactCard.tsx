@@ -20,7 +20,13 @@ interface AdminContactCardProps {
   onViewStatus?: () => void
 }
 
-export function AdminContactCard({ isOpen, onClose, adminProfile, statuses = [], onViewStatus }: AdminContactCardProps) {
+export function AdminContactCard({
+  isOpen,
+  onClose,
+  adminProfile,
+  statuses = [],
+  onViewStatus,
+}: AdminContactCardProps) {
   const hasStatuses = statuses.length > 0
 
   return (
@@ -32,23 +38,17 @@ export function AdminContactCard({ isOpen, onClose, adminProfile, statuses = [],
             <X className="h-5 w-5" />
           </Button>
         </DialogHeader>
-        
+
         <div className="p-4 space-y-6">
           <div className="bg-[#111b21] p-6 -mx-4 -mt-4 flex flex-col items-center gap-3">
             <div className="relative">
               {hasStatuses && (
-                <div 
-                  className="absolute -inset-2 rounded-full bg-[#00a884] cursor-pointer" 
-                  onClick={onViewStatus}
-                >
+                <div className="absolute -inset-2 rounded-full bg-[#00a884] cursor-pointer" onClick={onViewStatus}>
                   <div className="absolute inset-[3px] rounded-full bg-[#111b21]" />
                 </div>
               )}
-              <Avatar 
-                className={cn(
-                  "h-32 w-32 border-4 border-[#00a884]",
-                  hasStatuses && "cursor-pointer"
-                )}
+              <Avatar
+                className={cn("h-32 w-32 border-4 border-[#00a884]", hasStatuses && "cursor-pointer")}
                 onClick={hasStatuses ? onViewStatus : undefined}
               >
                 <AvatarImage src={adminProfile.avatar} className="object-cover" />
@@ -59,7 +59,7 @@ export function AdminContactCard({ isOpen, onClose, adminProfile, statuses = [],
 
               {/* Status Preview */}
               {hasStatuses && (
-                <div 
+                <div
                   className="absolute -right-16 top-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer shadow-lg transform scale-75 hover:scale-90 transition-transform"
                   onClick={onViewStatus}
                 >

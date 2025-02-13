@@ -58,12 +58,12 @@ export function EditContactDialog({ contact, onEditContact, categories = [], onC
       setIsLoading(true)
       await editContact(contact.id, newName, selectedCategories)
       onEditContact(contact.id, newName, selectedCategories)
-      
+
       addToast({
         title: "Éxito",
         description: "Contacto actualizado correctamente",
       })
-      
+
       setOpen(false)
     } catch (error) {
       console.error("Error editing contact:", error)
@@ -82,9 +82,9 @@ export function EditContactDialog({ contact, onEditContact, categories = [], onC
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button 
-        variant="ghost" 
-        size="icon" 
+      <Button
+        variant="ghost"
+        size="icon"
         className="text-[#aebac1] hover:text-[#e9edef] hover:bg-[#3a4952] transition-colors"
         onClick={() => setOpen(true)}
       >
@@ -155,13 +155,11 @@ export function EditContactDialog({ contact, onEditContact, categories = [], onC
                     className={cn(
                       "flex items-center gap-2 p-2.5 rounded-lg transition-colors",
                       "hover:bg-[#202c33] cursor-pointer",
-                      selectedCategories.includes(category.id) && "bg-[#202c33]"
+                      selectedCategories.includes(category.id) && "bg-[#202c33]",
                     )}
                     onClick={() => {
-                      setSelectedCategories(prev =>
-                        prev.includes(category.id)
-                          ? prev.filter(id => id !== category.id)
-                          : [...prev, category.id]
+                      setSelectedCategories((prev) =>
+                        prev.includes(category.id) ? prev.filter((id) => id !== category.id) : [...prev, category.id],
                       )
                     }}
                   >

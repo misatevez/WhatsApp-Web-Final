@@ -1,20 +1,7 @@
 import { db, storage } from "../firebase"
-import {
-  collection,
-  doc,
-  getDocs,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  serverTimestamp,
-} from "firebase/firestore"
+import { collection, doc, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore"
 // Se utiliza uploadBytesResumable para poder usar el método "on" y obtener el progreso de carga
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-  deleteObject,
-} from "firebase/storage"
+import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "firebase/storage"
 import type { AdminStatus } from "@/types/interfaces"
 
 /**
@@ -40,9 +27,7 @@ export async function fetchAdminStatuses(): Promise<AdminStatus[]> {
 /**
  * Agrega un nuevo estado a la colección.
  */
-export async function addAdminStatus(
-  status: Omit<AdminStatus, "id">
-): Promise<string> {
+export async function addAdminStatus(status: Omit<AdminStatus, "id">): Promise<string> {
   console.log("addAdminStatus called with:", status)
   const statusesRef = collection(db, "adminStatuses")
   try {
@@ -62,10 +47,7 @@ export async function addAdminStatus(
 /**
  * Actualiza un estado existente con los datos proporcionados.
  */
-export async function updateAdminStatus(
-  statusId: string,
-  updates: Partial<AdminStatus>
-): Promise<void> {
+export async function updateAdminStatus(statusId: string, updates: Partial<AdminStatus>): Promise<void> {
   console.log("updateAdminStatus called with:", { statusId, updates })
   const statusRef = doc(db, "adminStatuses", statusId)
   try {
@@ -99,10 +81,7 @@ export async function deleteAdminStatus(statusId: string): Promise<void> {
  * Sube una imagen al Storage de Firebase, permite seguir el progreso de carga y retorna la URL de descarga.
  * Se agrega una validación básica para asegurarse de que el archivo sea una imagen.
  */
-export async function uploadStatusImage(
-  file: File,
-  onProgress?: (progress: number) => void
-): Promise<string> {
+export async function uploadStatusImage(file: File, onProgress?: (progress: number) => void): Promise<string> {
   console.log("uploadStatusImage called")
 
   // Validación: Solo se permiten archivos de imagen
@@ -118,8 +97,7 @@ export async function uploadStatusImage(
     // Si se proporcionó un callback para el progreso, se suscribe al evento "state_changed"
     if (onProgress) {
       uploadTask.on("state_changed", (snapshot) => {
-        const progress =
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         onProgress(progress)
       })
     }

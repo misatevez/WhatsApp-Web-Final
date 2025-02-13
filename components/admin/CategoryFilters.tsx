@@ -31,17 +31,15 @@ export function CategoryFilters({ categories, selectedCategories, onCategoryClic
             "text-xs",
             selectedCategories.includes(category.id) ? "bg-[#00a884] text-white" : "bg-[#202c33] text-[#aebac1]",
           )}
-          style={{ 
+          style={{
             borderColor: category.color,
-            backgroundColor: selectedCategories.includes(category.id) ? category.color : undefined 
+            backgroundColor: selectedCategories.includes(category.id) ? category.color : undefined,
           }}
           onClick={() => onCategoryClick(category.id)}
         >
           {category.name}
           {category.count > 0 && (
-            <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-opacity-20 bg-white">
-              {category.count}
-            </span>
+            <span className="ml-1 px-1.5 py-0.5 text-xs rounded-full bg-opacity-20 bg-white">{category.count}</span>
           )}
         </Button>
       ))}

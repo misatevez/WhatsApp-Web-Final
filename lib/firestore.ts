@@ -18,11 +18,7 @@ export { db, storage, chats, messages, adminProfile, categories, unknownContacts
 export const { fetchChats, fetchChat, upsertChat, editContact, blockContact, unblockContact } = chats
 
 // Messages
-export const { 
-  sendMessage,
-  resetUnreadCount,
-  markMessagesAsRead,
-} = messages
+export const { sendMessage, resetUnreadCount, markMessagesAsRead } = messages
 
 // Admin Profile
 export const { fetchAdminProfile, updateAdminProfile, uploadProfilePicture } = adminProfile

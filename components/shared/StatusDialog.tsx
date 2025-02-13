@@ -30,7 +30,7 @@ export function StatusDialog({ isOpen, onClose, statuses, onStatusResponse }: St
 
   const handleSendResponse = async () => {
     if (!response.trim() || !statuses[currentIndex]) return
-    
+
     setIsLoading(true)
     try {
       await onStatusResponse(response.trim(), statuses[currentIndex].imageUrl)
@@ -52,12 +52,7 @@ export function StatusDialog({ isOpen, onClose, statuses, onStatusResponse }: St
       <DialogContent className="bg-[#111b21] border-none text-[#e9edef] max-w-md p-0">
         <DialogHeader className="bg-[#202c33] px-4 py-3 flex-row items-center justify-between">
           <DialogTitle className="text-[#e9edef] text-base">Estado</DialogTitle>
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose} 
-            className="text-[#aebac1] hover:text-[#e9edef] h-8 w-8"
-          >
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-[#aebac1] hover:text-[#e9edef] h-8 w-8">
             <X className="h-5 w-5" />
           </Button>
         </DialogHeader>
@@ -65,12 +60,7 @@ export function StatusDialog({ isOpen, onClose, statuses, onStatusResponse }: St
         <div className="relative">
           {/* Status Image Container */}
           <div className="relative aspect-[4/5] w-full bg-black">
-            <Image
-              src={currentStatus.imageUrl}
-              alt={currentStatus.caption}
-              fill
-              className="object-contain"
-            />
+            <Image src={currentStatus.imageUrl} alt={currentStatus.caption} fill className="object-contain" />
           </div>
 
           {/* Caption */}
@@ -133,10 +123,7 @@ export function StatusDialog({ isOpen, onClose, statuses, onStatusResponse }: St
         {/* Status Progress Indicators */}
         <div className="absolute top-[52px] left-0 right-0 px-2 flex gap-1">
           {statuses.map((_, index) => (
-            <div
-              key={index}
-              className="flex-1 h-0.5 bg-white/30 overflow-hidden"
-            >
+            <div key={index} className="flex-1 h-0.5 bg-white/30 overflow-hidden">
               <div
                 className={`h-full bg-white transition-all duration-300 ${
                   index === currentIndex ? "w-full" : index < currentIndex ? "w-full" : "w-0"

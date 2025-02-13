@@ -31,8 +31,8 @@ export function SearchBar({ searchQuery, setSearchQuery }: SearchBarProps) {
             </Button>
           )}
         </div>
-        
-        <a 
+
+        <a
           href="https://api.whatsapp.com/send/?phone=5493584877949"
           target="_blank"
           rel="noopener noreferrer"

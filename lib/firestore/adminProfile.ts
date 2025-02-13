@@ -39,15 +39,15 @@ export async function updateAdminProfile(profile: Partial<AdminProfile>): Promis
 
 export async function uploadProfilePicture(file: File, onProgress?: (progress: number) => void): Promise<string> {
   console.log("uploadProfilePicture called with file:", file.name)
-  
+
   // Create a unique filename using timestamp
   const filename = `adminProfile/avatar_${Date.now()}_${file.name}`
   const storageRef = ref(storage, filename)
-  
+
   try {
     // Create upload task
     const uploadTask = uploadBytesResumable(storageRef, file)
-    
+
     // Return a promise that resolves with the download URL
     return new Promise((resolve, reject) => {
       uploadTask.on(
@@ -75,7 +75,7 @@ export async function uploadProfilePicture(file: File, onProgress?: (progress: n
             console.error("Error getting download URL:", error)
             reject(error)
           }
-        }
+        },
       )
     })
   } catch (error) {

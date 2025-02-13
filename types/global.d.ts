@@ -1,4 +1,4 @@
 interface Window {
-  recaptchaVerifier: any;
+  recaptchaVerifier: any
 }
 

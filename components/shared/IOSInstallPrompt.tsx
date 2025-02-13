@@ -14,11 +14,11 @@ export function IOSInstallPrompt() {
   useEffect(() => {
     // Check if device is iOS
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
-    
+
     // Check if already installed
-    const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
-      || (window.navigator as any).standalone
-    
+    const isInStandaloneMode =
+      window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone
+
     setIsIOS(isIOSDevice)
     setIsStandalone(isInStandaloneMode)
 
@@ -43,9 +43,7 @@ export function IOSInstallPrompt() {
               height={40}
             />
           </div>
-          <DialogTitle className="text-center text-base">
-            Instalar WhatsApp Web
-          </DialogTitle>
+          <DialogTitle className="text-center text-base">Instalar WhatsApp Web</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">

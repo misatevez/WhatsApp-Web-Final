@@ -17,17 +17,17 @@ function getDisplayTime(rawTimestamp: any): string {
 
   try {
     // Handle Firestore Timestamp
-    if (typeof rawTimestamp === 'object' && rawTimestamp !== null && 'seconds' in rawTimestamp) {
+    if (typeof rawTimestamp === "object" && rawTimestamp !== null && "seconds" in rawTimestamp) {
       const milliseconds = rawTimestamp.seconds * 1000 + (rawTimestamp.nanoseconds || 0) / 1000000
       const date = new Date(milliseconds)
-      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
     }
 
     // Handle ISO string
-    if (typeof rawTimestamp === 'string') {
+    if (typeof rawTimestamp === "string") {
       const date = new Date(rawTimestamp)
       if (!isNaN(date.getTime())) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+        return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false })
       }
     }
 
@@ -43,12 +43,12 @@ function parseTimestampToNumber(rawTimestamp: any): number {
 
   try {
     // Handle Firestore Timestamp
-    if (typeof rawTimestamp === 'object' && rawTimestamp !== null && 'seconds' in rawTimestamp) {
+    if (typeof rawTimestamp === "object" && rawTimestamp !== null && "seconds" in rawTimestamp) {
       return rawTimestamp.seconds * 1000 + (rawTimestamp.nanoseconds || 0) / 1000000
     }
 
     // Handle ISO string
-    if (typeof rawTimestamp === 'string') {
+    if (typeof rawTimestamp === "string") {
       const date = new Date(rawTimestamp)
       return isNaN(date.getTime()) ? 0 : date.getTime()
     }
@@ -74,7 +74,7 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
   useEffect(() => {
     const loadUserAvatars = async () => {
       const urls: { [key: string]: string } = {}
-      
+
       for (const chat of chats) {
         if (chat.phoneNumber) {
           try {
@@ -88,7 +88,7 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
           }
         }
       }
-      
+
       setAvatarUrls(urls)
     }
 
@@ -107,38 +107,38 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
 
   const handleDeleteChat = async (e: React.MouseEvent, chatId: string) => {
     e.stopPropagation() // Prevent chat selection when clicking delete
-    
+
     if (isDeleting) return // Prevent multiple deletes at once
-    
+
     try {
       setIsDeleting(chatId)
-      
+
       // Delete all messages in the messages subcollection
       const messagesRef = collection(db, `chats/${chatId}/messages`)
       const messagesSnapshot = await getDocs(messagesRef)
-      
+
       // Use batch to delete all messages
       const batch = writeBatch(db)
-      messagesSnapshot.docs.forEach(doc => {
+      messagesSnapshot.docs.forEach((doc) => {
         batch.delete(doc.ref)
       })
       await batch.commit()
-      
+
       // If this was the selected chat, clear selection
       if (selectedChatId === chatId) {
         dispatch(setSelectedChat(null))
       }
-      
+
       addToast({
         title: "Mensajes eliminados",
-        description: "Se eliminó el historial de mensajes"
+        description: "Se eliminó el historial de mensajes",
       })
     } catch (error) {
       console.error("Error deleting messages:", error)
       addToast({
         title: "Error",
         description: "No se pudo eliminar el historial de mensajes",
-        variant: "destructive"
+        variant: "destructive",
       })
     } finally {
       setIsDeleting(null)
@@ -154,7 +154,7 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
         const badgeCount = chat.unreadCount ?? 0
         const nameClass = badgeCount > 0 ? "text-white font-bold" : "text-[#e9edef] font-medium"
         const lastMessageClass = badgeCount > 0 ? "text-[#e9edef] font-bold" : "text-[#8696a0]"
-        
+
         const avatarUrl = avatarUrls[chat.phoneNumber] || DEFAULT_AVATAR
         const lastMessage = chat.lastMessageUser || chat.lastMessageAdmin || chat.lastMessage || ""
 
@@ -176,7 +176,9 @@ export function ChatList({ chats, selectedChatId }: ChatListProps) {
                 <div className="flex items-center gap-1">
                   <h3 className={cn("truncate text-base", nameClass)}>{displayName}</h3>
                   {chat.isBlocked && (
-                    <span className="text-red-500" title="Usuario bloqueado">🚫</span>
+                    <span className="text-red-500" title="Usuario bloqueado">
+                      🚫
+                    </span>
                   )}
                 </div>
                 <span className="text-xs text-[#8696a0]">{displayedTime}</span>

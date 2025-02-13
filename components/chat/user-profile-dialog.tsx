@@ -9,8 +9,7 @@ import { BaseDialog } from "@/components/shared/base-dialog"
 import type React from "react"
 
 // EJEMPLO: tu default avatar
-const DEFAULT_AVATAR =
-  "https://firebasestorage.googleapis.com/v0/b/..."
+const DEFAULT_AVATAR = "https://firebasestorage.googleapis.com/v0/b/..."
 
 interface ProfileData {
   name: string
@@ -25,14 +24,11 @@ interface UserProfileDialogProps {
   children: React.ReactNode
 }
 
-/** 
- * Función local para simular guardado en la DB. 
+/**
+ * Función local para simular guardado en la DB.
  * Ajusta según tu Firestore (updateDoc, setDoc, etc.).
  */
-async function updateUserProfileDB(
-  phoneNumber: string,
-  newData: { name: string; avatar: string }
-) {
+async function updateUserProfileDB(phoneNumber: string, newData: { name: string; avatar: string }) {
   console.log("[updateUserProfileDB] Save to Firestore =>", phoneNumber, newData)
   // Realmente harías algo como:
   // const docRef = doc(db, "users", phoneNumber)
@@ -75,15 +71,9 @@ export function UserProfileDialog({ profile, onUpdate, children }: UserProfileDi
 
   return (
     <>
-      <div onClick={() => setIsOpen(true)}>
-        {children}
-      </div>
+      <div onClick={() => setIsOpen(true)}>{children}</div>
 
-      <BaseDialog
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-        title="Profile Settings"
-      >
+      <BaseDialog isOpen={isOpen} onClose={() => setIsOpen(false)} title="Profile Settings">
         <div className="flex justify-center mb-4">
           <div className="relative">
             <Avatar className="h-32 w-32">
@@ -95,13 +85,7 @@ export function UserProfileDialog({ profile, onUpdate, children }: UserProfileDi
               className="absolute bottom-0 right-0 bg-[#00a884] rounded-full p-2 cursor-pointer hover:bg-[#02906f]"
             >
               <Camera className="h-5 w-5 text-white" />
-              <input
-                id="avatar-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleAvatarChange}
-              />
+              <input id="avatar-upload" type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
             </label>
           </div>
         </div>
@@ -124,10 +108,7 @@ export function UserProfileDialog({ profile, onUpdate, children }: UserProfileDi
           />
         </div>
 
-        <Button
-          onClick={handleSave}
-          className="w-full bg-[#00a884] hover:bg-[#02906f] text-white"
-        >
+        <Button onClick={handleSave} className="w-full bg-[#00a884] hover:bg-[#02906f] text-white">
           Save
         </Button>
       </BaseDialog>

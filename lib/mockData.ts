@@ -45,7 +45,8 @@ export const mockChats: Chat[] = [
     unreadCount: 2,
     isAgendado: true,
     lastReadMessageId: "2",
-    photoURL: "https://firebasestorage.googleapis.com/v0/b/cargatusfichas.firebasestorage.app/o/profiles%2F11111111_1739056079632.jpg?alt=media&token=26f755ee-0f3d-4b4d-9d62-8d6eddea8421",
+    photoURL:
+      "https://firebasestorage.googleapis.com/v0/b/cargatusfichas.firebasestorage.app/o/profiles%2F11111111_1739056079632.jpg?alt=media&token=26f755ee-0f3d-4b4d-9d62-8d6eddea8421",
     messages: [
       createMessage("1", "Hola, ¿cómo estás?", "2023-05-10T06:15:00Z", false, "text", "read"),
       createMessage("2", "Bien, gracias por preguntar", "2023-05-10T06:18:00Z", true, "text", "read"),
