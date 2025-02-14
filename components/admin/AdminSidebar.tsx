@@ -1,3 +1,5 @@
+"use client"
+
 import { DEFAULT_AVATAR } from "@/constants/constants"
 import { useState } from "react"
 import { MessageSquare, Users, LogOut } from "lucide-react"

@@ -11,45 +11,12 @@ import { collection, query, orderBy, onSnapshot } from "firebase/firestore"
 import { db } from "@/lib/firebase"
 import { uploadSticker } from "@/lib/firestore/stickers"
 import type { Message } from "@/types/interfaces"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
 
 const URL_PATTERN = /(?:https?:\/\/)?(?:www\.)?([^\s<]+\.[^\s<]+)/gi
 
-const convertUrlsToLinks = (text: string) => {
-  const parts = text.split(URL_PATTERN)
-  const matches = text.match(URL_PATTERN)
-
-  if (!matches) return text
-
-  const result = []
-  let i = 0
-
-  matches.forEach((url, index) => {
-    if (parts[i]) {
-      result.push(parts[i])
-    }
-
-    const fullUrl = url.startsWith("http") ? url : `https://${url}`
-    result.push(
-      <a
-        key={index}
-        href={fullUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="text-[#53bdeb] underline hover:text-[#7ccbf0]"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {url}
-      </a>,
-    )
-    i += 2
-  })
-
-  if (parts[i]) {
-    result.push(parts[i])
-  }
-
-  return <>{result}</>
-}
+const convertUrlsToLinks = (text: string) => text
 
 interface MessageListProps {
   messages: Message[]
@@ -145,7 +112,9 @@ export const MessageList = React.memo(
     }
 
     const filteredMessages = chatSearchQuery
-      ? messages.filter((m) => m.content.toLowerCase().includes(chatSearchQuery.toLowerCase()))
+      ? messages.filter((m) =>
+          m.type === "text" ? m.content.toLowerCase().includes(chatSearchQuery.toLowerCase()) : false,
+        )
       : messages
 
     const renderMessageStatus = useCallback(
@@ -199,9 +168,22 @@ export const MessageList = React.memo(
                   } ${chatSearchQuery ? "bg-[#0b3d36]" : ""}`}
                 >
                   {message.type === "text" ? (
-                    <p className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap">
-                      {convertUrlsToLinks(message.content)}
-                    </p>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        a: ({ node, ...props }) => (
+                          <a
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#53bdeb] underline hover:text-[#7ccbf0]"
+                            {...props}
+                          />
+                        ),
+                      }}
+                      className="text-sm sm:text-base text-[#e9edef] whitespace-pre-wrap break-words"
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   ) : message.type === "sticker" ? (
                     <img
                       src={message.content || "/placeholder.svg"}
