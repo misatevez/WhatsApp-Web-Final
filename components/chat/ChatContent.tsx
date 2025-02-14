@@ -264,7 +264,7 @@ Solicita tu usuario en la plataforma que más te guste 📲 y consulta el CVU pa
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-cyan-900">
       <ChatHeader
         name={adminProfile.name}
         avatar={adminProfile.avatar}

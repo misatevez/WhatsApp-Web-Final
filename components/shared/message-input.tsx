@@ -85,7 +85,7 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
   }
 
   return (
-    <div className="relative min-h-[62px] px-2 sm:px-4 pb-safe w-full">
+    <div className="relative min-h-[62px] px-2 sm:px-4 pb-safe w-full bg-red-800">
       {/* Background container with rounded corners */}
       <div className="absolute inset-0 bg-[#202c33]" />
 
@@ -105,7 +105,12 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
           disabled={isLoading}
         />
 
-        {isAdminRoute && <DynamicStickerPicker onStickerSelect={handleStickerSelect} disabled={isLoading} />}
+        {isAdminRoute && (
+          <DynamicStickerPicker
+            onStickerSelect={handleStickerSelect}
+            disabled={isLoading}
+          />
+        )}
 
         <div className="flex-1 min-w-0 px-1">
           <Textarea
@@ -130,8 +135,8 @@ export function MessageInput({ chatId, onSendMessage }: MessageInputProps) {
         >
           <Send className="h-5 w-5 sm:h-6 sm:w-6" />
         </Button>
-      </div>
+      </div> 
     </div>
-  )
+  );
 }
 
