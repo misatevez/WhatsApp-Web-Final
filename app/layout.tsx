@@ -84,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               -webkit-tap-highlight-color: transparent;
               -webkit-touch-callout: none;
               background: #0b141a;
-              padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+              padding: env(safe-area-inset-top) env(safe-area-inset-right)  env(safe-area-inset-left);
             }
             #__next {
               background: #0b141a;
