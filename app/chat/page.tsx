@@ -68,7 +68,8 @@ export default function ChatPage() {
       <div
         className="relative h-full w-full"
         style={{
-          paddingTop: "env(safe-area-inset-top)",
+          paddingTop: `calc(env(safe-area-inset-top) + 10px)`,
+        
           paddingLeft: "env(safe-area-inset-left)",
           paddingRight: "env(safe-area-inset-right)",
         }}
